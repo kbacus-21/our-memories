@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Memories 💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    :root {
+      --bg: #0e0b14;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,200,220,0.12);
+      --border-hover: rgba(255,180,200,0.3);
+      --rose: #e8637a;
+      --rose-dark: #c04060;
+      --gold: #f0c8a0;
+      --gold-dim: rgba(240,200,160,0.5);
+      --text: #fdf0f4;
+      --text-dim: rgba(253,240,244,0.55);
+      --text-dimmer: rgba(253,240,244,0.3);
+      --glass: rgba(20,12,22,0.88);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(180,60,100,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 80%,rgba(100,40,140,0.15) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(30,10,50,0.8) 0%,transparent 100%);z-index:0;pointer-events:none;}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:200px 200px;opacity:0.4;z-index:0;pointer-events:none;}
+
+    /* ── CELEBRATION OVERLAY ── */
+    #celebration-overlay{
+      display:none;position:fixed;inset:0;z-index:9000;
+      align-items:center;justify-content:center;
+      pointer-events:none;
+    }
+    #celebration-overlay.show{display:flex;}
+    #celebration-overlay.clickable{pointer-events:all;}
+    .celebration-bg{
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at center,rgba(232,99,122,0.35) 0%,rgba(180,40,80,0.2) 40%,transparent 70%);
+      animation:celebPulse 3s ease-in-out infinite;
+    }
+    @keyframes celebPulse{0%,100%{opacity:0.7;}50%{opacity:1;}}
+    .celebration-card{
+      position:relative;z-index:1;
+      background:rgba(15,8,20,0.92);
+      border:1px solid rgba(232,99,122,0.5);
+      border-radius:24px;padding:3rem 2.5rem;
+      text-align:center;max-width:480px;width:90%;
+      box-shadow:0 0 80px rgba(232,99,122,0.3),0 40px 80px rgba(0,0,0,0.7);
+      backdrop-filter:blur(20px);
+      animation:celebIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes celebIn{from{opacity:0;transform:scale(0.7);}to{opacity:1;transform:scale(1);}}
+    .celebration-emoji{font-size:4rem;margin-bottom:1rem;animation:heartBeat 1.2s ease-in-out infinite;}
+    @keyframes heartBeat{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+    .celebration-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--gold);margin-bottom:0.5rem;}
+    .celebration-sub{color:var(--text-dim);font-size:1rem;margin-bottom:0.5rem;}
+    .celebration-years{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--rose);margin-bottom:1.5rem;}
+    .celebration-close{padding:0.7rem 2rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border:none;border-radius:50px;color:white;font-size:0.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    /* hearts */
+    .hearts-container{position:fixed;inset:0;pointer-events:none;z-index:8999;overflow:hidden;}
+    .heart-particle{position:absolute;bottom:-50px;font-size:1.5rem;animation:floatHeart linear forwards;opacity:0;}
+    @keyframes floatHeart{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(-110vh) rotate(360deg);}}
+
+    /* ── REMINDER BANNER ── */
+    #reminder-banner{
+      display:none;position:fixed;top:0;left:0;right:0;z-index:8000;
+      background:linear-gradient(135deg,rgba(232,99,122,0.95),rgba(192,64,96,0.95));
+      color:white;text-align:center;padding:0.8rem 3rem;
+      font-size:0.95rem;backdrop-filter:blur(10px);
+      box-shadow:0 4px 20px rgba(232,99,122,0.4);
+      animation:slideDown 0.4s ease;
+    }
+    @keyframes slideDown{from{transform:translateY(-100%);}to{transform:translateY(0);}}
+    #reminder-banner.show{display:block;}
+    #reminder-close{position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;opacity:0.8;}
+
+    /* ── SLIDESHOW ── */
+    #slideshow-overlay{
+      display:none;position:fixed;inset:0;z-index:7000;
+      background:rgba(0,0,0,0.97);
+      align-items:center;justify-content:center;
+      flex-direction:column;gap:1.5rem;
+    }
+    #slideshow-overlay.open{display:flex;}
+    #slideshow-img{
+      max-width:85vw;max-height:70vh;
+      object-fit:contain;border-radius:12px;
+      box-shadow:0 30px 80px rgba(0,0,0,0.8);
+      animation:ssIn 0.5s ease;
+    }
+    @keyframes ssIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+    .ss-caption{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;color:var(--gold);text-align:center;max-width:600px;}
+    .ss-controls{display:flex;gap:1rem;align-items:center;}
+    .ss-btn{padding:0.6rem 1.2rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50px;color:white;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .ss-btn:hover{background:rgba(232,99,122,0.4);}
+    .ss-btn.active{background:var(--rose)!important;border-color:var(--rose)!important;}
+    #ss-close{position:fixed;top:1.5rem;right:1.5rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;cursor:pointer;}
+    #ss-close:hover{background:rgba(232,99,122,0.4);}
+    .ss-counter{color:var(--text-dim);font-size:0.85rem;}
+
+    /* ── LOGIN ── */
+    #login-page{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:999;}
+    .login-box{position:relative;background:rgba(15,9,22,0.92);border:1px solid var(--border-hover);border-radius:20px;padding:3.5rem 3rem;width:100%;max-width:420px;text-align:center;display:flex;flex-direction:column;gap:1.1rem;backdrop-filter:blur(20px);box-shadow:0 40px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,200,220,0.1);}
+    .login-box::before{content:'';position:absolute;inset:-1px;border-radius:20px;background:linear-gradient(135deg,rgba(232,99,122,0.4),transparent 50%,rgba(180,100,200,0.2));z-index:-1;pointer-events:none;}
+    .login-box h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;letter-spacing:0.02em;color:var(--text);}
+    .login-box .subtitle{color:var(--text-dim);font-size:0.9rem;letter-spacing:0.06em;}
+    .login-box input{padding:0.9rem 1.2rem;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:0.95rem;outline:none;width:100%;font-family:'DM Sans',sans-serif;transition:border-color 0.2s,background 0.2s;}
+    .login-box input:focus{border-color:var(--rose);background:rgba(232,99,122,0.05);}
+    .login-box input::placeholder{color:var(--text-dimmer);}
+    #login-btn{padding:0.95rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border:none;border-radius:50px;color:white;font-size:1rem;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.05em;transition:opacity 0.2s,transform 0.1s;box-shadow:0 8px 24px rgba(232,99,122,0.35);}
+    #login-btn:hover{opacity:0.9;transform:translateY(-1px);}
+    #register-btn{padding:0.95rem;background:transparent;border:1px solid var(--gold-dim);border-radius:50px;color:var(--gold);font-size:0.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    #register-btn:hover{background:rgba(240,200,160,0.08);border-color:var(--gold);}
+    .error{color:var(--rose);font-size:0.85rem;min-height:1.1rem;}
+
+    /* ── NAV ── */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 2rem;background:var(--glass);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:0.5rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+    .nav-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--gold);letter-spacing:0.03em;}
+    .nav-user{font-size:0.8rem;color:var(--text-dim);margin-left:0.5rem;}
+    .nav-links{display:flex;gap:0.4rem;flex-wrap:wrap;}
+    .nav-links button{padding:0.42rem 0.9rem;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text);cursor:pointer;font-size:0.82rem;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .nav-links button:hover,.nav-links button.active-nav{background:var(--surface2);border-color:var(--border-hover);}
+    #logout-btn{color:rgba(232,99,122,0.8)!important;border-color:rgba(232,99,122,0.25)!important;}
+    #logout-btn:hover{background:rgba(232,99,122,0.1)!important;}
+
+    /* ── MAIN ── */
+    #app-page{display:none;}
+    main{max-width:1000px;margin:0 auto;padding:2.5rem 1.5rem;position:relative;z-index:1;}
+    .section{display:none;animation:fadeUp 0.35s ease;}
+    .section.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+    .section-header h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--gold);letter-spacing:0.02em;}
+
+    /* ── BUTTONS ── */
+    .btn-rose{padding:0.8rem 1.5rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border:none;border-radius:50px;color:white;font-size:0.9rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.2s,transform 0.1s;box-shadow:0 6px 18px rgba(232,99,122,0.28);align-self:flex-start;}
+    .btn-rose:hover{opacity:0.88;transform:translateY(-1px);}
+    .btn-gold{padding:0.6rem 1.2rem;background:transparent;border:1px solid var(--gold-dim);border-radius:50px;color:var(--gold);font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .btn-gold:hover{background:rgba(240,200,160,0.1);border-color:var(--gold);}
+    .btn-danger{padding:0.5rem 1rem;background:transparent;border:1px solid rgba(232,99,122,0.3);border-radius:50px;color:rgba(232,99,122,0.8);font-size:0.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .btn-danger:hover{background:rgba(232,99,122,0.12);border-color:var(--rose);}
+
+    /* ── FORMS ── */
+    .add-form{display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+    .add-form input,.add-form textarea{padding:0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.95rem;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+    .add-form input:focus,.add-form textarea:focus{border-color:var(--rose);}
+    .add-form input::placeholder,.add-form textarea::placeholder{color:var(--text-dimmer);}
+    .add-form textarea{height:90px;resize:vertical;}
+
+    /* ── RANDOM MEMORY ── */
+    .random-memory-card{background:linear-gradient(135deg,rgba(232,99,122,0.08),rgba(180,60,100,0.05));border:1px solid rgba(232,99,122,0.25);border-radius:16px;padding:1.5rem;margin-bottom:2rem;display:none;animation:fadeUp 0.4s ease;text-align:center;}
+    .random-memory-card.show{display:block;}
+    .random-memory-card img{width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:1rem;cursor:pointer;}
+    .random-memory-label{font-size:0.75rem;color:var(--rose);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;}
+    .random-memory-caption{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;color:var(--gold);}
+    .random-memory-time{font-size:0.75rem;color:var(--text-dimmer);margin-top:0.3rem;}
+
+    /* ── ALBUMS ── */
+    .albums-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin-bottom:2rem;}
+    .album-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all 0.25s;position:relative;}
+    .album-card:hover{border-color:var(--border-hover);background:var(--surface2);transform:translateY(-3px);}
+    .album-icon{font-size:2.5rem;margin-bottom:0.6rem;}
+    .album-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text);margin-bottom:0.2rem;}
+    .album-count{font-size:0.78rem;color:var(--text-dim);}
+    .album-del{position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--text-dimmer);cursor:pointer;font-size:1rem;opacity:0;transition:opacity 0.2s;}
+    .album-card:hover .album-del{opacity:1;}
+    .album-back-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-dim);font-size:0.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;margin-bottom:1.5rem;}
+    .album-back-btn:hover{border-color:var(--border-hover);color:var(--text);}
+
+    /* ── PHOTO GRID ── */
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;}
+    .photo-card{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--surface);transition:all 0.25s;position:relative;}
+    .photo-card:hover{border-color:var(--border-hover);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.4);}
+    .photo-thumb-wrap{position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer;}
+    .photo-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s;}
+    .photo-card:hover img{transform:scale(1.04);}
+    .photo-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%);opacity:0;transition:opacity 0.25s;display:flex;align-items:flex-end;padding:0.8rem;gap:0.5rem;}
+    .photo-card:hover .photo-overlay{opacity:1;}
+    .photo-meta{padding:0.8rem 1rem 0;}
+    .photo-caption-text{font-style:italic;color:var(--text);font-size:0.95rem;margin-bottom:0.3rem;}
+    .photo-time{font-size:0.72rem;color:var(--text-dimmer);margin-bottom:0.6rem;}
+    .photo-actions{display:flex;gap:0.4rem;padding:0 1rem 0.6rem;flex-wrap:wrap;}
+    .photo-comments-section{border-top:1px solid var(--border);padding:0.8rem 1rem;}
+    .comments-list{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem;max-height:120px;overflow-y:auto;}
+    .comment-item{font-size:0.82rem;color:var(--text-dim);display:flex;gap:0.4rem;align-items:flex-start;}
+    .comment-sender{color:var(--gold);font-size:0.78rem;white-space:nowrap;flex-shrink:0;}
+    .comment-del{background:none;border:none;color:var(--text-dimmer);cursor:pointer;font-size:0.75rem;margin-left:auto;flex-shrink:0;}
+    .comment-del:hover{color:var(--rose);}
+    .comment-input-row{display:flex;gap:0.5rem;}
+    .comment-input-row input{flex:1;padding:0.45rem 0.8rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:50px;color:var(--text);font-size:0.82rem;outline:none;font-family:'DM Sans',sans-serif;}
+    .comment-input-row input:focus{border-color:var(--rose);}
+    .comment-input-row button{padding:0.4rem 0.8rem;background:var(--rose);border:none;border-radius:50px;color:white;font-size:0.8rem;cursor:pointer;}
+    .edit-caption-row{display:flex;gap:0.5rem;padding:0 1rem 0.6rem;}
+    .edit-caption-row input{flex:1;padding:0.4rem 0.8rem;background:rgba(255,255,255,0.05);border:1px solid var(--rose);border-radius:8px;color:var(--text);font-size:0.88rem;outline:none;font-family:'DM Sans',sans-serif;}
+    .edit-caption-row button{padding:0.4rem 0.8rem;background:var(--rose);border:none;border-radius:8px;color:white;font-size:0.8rem;cursor:pointer;}
+
+    /* ── LIGHTBOX ── */
+    #lightbox{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.93);align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:2rem;}
+    #lightbox.open{display:flex;}
+    #lightbox img{max-width:90vw;max-height:85vh;border-radius:10px;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,0.8);}
+    #lightbox-close{position:fixed;top:1.5rem;right:1.5rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;cursor:pointer;transition:background 0.2s;}
+    #lightbox-close:hover{background:rgba(232,99,122,0.4);}
+
+    /* ── NOTES ── */
+    .notes-list{display:flex;flex-direction:column;gap:1rem;}
+    .note-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.5rem;transition:border-color 0.2s;}
+    .note-card:hover{border-color:var(--border-hover);}
+    .note-card h3{font-family:'Cormorant Garamond',serif;color:var(--gold);margin-bottom:0.3rem;font-size:1.2rem;font-weight:400;}
+    .note-card p{color:rgba(253,240,244,0.75);line-height:1.75;font-size:0.95rem;}
+    .note-card-actions{display:flex;gap:0.4rem;margin-top:0.8rem;}
+    .note-time{font-size:0.72rem;color:var(--text-dimmer);margin-bottom:0.4rem;}
+
+    /* ── TIMELINE ── */
+    .timeline-list{display:flex;flex-direction:column;gap:1rem;}
+    .timeline-card{display:flex;gap:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.5rem;transition:border-color 0.2s;}
+    .timeline-card:hover{border-color:var(--border-hover);}
+    .timeline-date{color:var(--gold);font-size:0.85rem;white-space:nowrap;min-width:80px;padding-top:0.1rem;}
+    .timeline-body h3{font-family:'Cormorant Garamond',serif;color:var(--text);margin-bottom:0.3rem;font-size:1.1rem;font-weight:400;}
+    .timeline-body p{color:var(--text-dim);font-size:0.9rem;}
+    .timeline-card-actions{display:flex;gap:0.4rem;margin-top:0.6rem;}
+
+    /* ── MESSAGES ── */
+    .messages-list{display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.2rem;max-height:500px;overflow-y:auto;padding:1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;}
+    .message-bubble{max-width:75%;padding:0.75rem 1.1rem;border-radius:20px;font-size:0.95rem;line-height:1.5;}
+    .message-bubble.mine{align-self:flex-end;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;border-bottom-right-radius:4px;}
+    .message-bubble.theirs{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
+    .msg-sender{font-size:0.72rem;opacity:0.65;margin-bottom:0.2rem;}
+    .msg-time{font-size:0.68rem;opacity:0.5;margin-top:0.3rem;text-align:right;}
+    .message-input-area{display:flex;flex-direction:column;gap:0.6rem;}
+    .message-input-row{display:flex;gap:0.6rem;align-items:center;}
+    .message-input-row input{flex:1;padding:0.85rem 1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text);font-size:0.95rem;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+    .message-input-row input:focus{border-color:var(--rose);}
+    .message-input-row button{padding:0.85rem 1.4rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border:none;border-radius:50px;color:white;font-size:0.9rem;cursor:pointer;white-space:nowrap;}
+    /* voice */
+    #record-btn{
+      width:46px;height:46px;border-radius:50%;
+      background:var(--surface2);border:1px solid var(--border);
+      color:var(--text);font-size:1.1rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:all 0.2s;flex-shrink:0;
+    }
+    #record-btn:hover{border-color:var(--rose);}
+    #record-btn.recording{background:var(--rose);border-color:var(--rose);animation:recPulse 1s ease-in-out infinite;}
+    @keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,99,122,0.4);}50%{box-shadow:0 0 0 10px rgba(232,99,122,0);}}
+    .voice-bubble{display:flex;align-items:center;gap:0.6rem;}
+    .voice-bubble audio{height:32px;filter:invert(0.8) sepia(0.3) hue-rotate(310deg);}
+    .voice-bubble audio::-webkit-media-controls-panel{background:transparent;}
+
+    /* ── MODAL ── */
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:#130a18;border:1px solid var(--border-hover);border-radius:18px;padding:2rem;width:100%;max-width:400px;display:flex;flex-direction:column;gap:1rem;box-shadow:0 30px 60px rgba(0,0,0,0.6);}
+    .modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--gold);}
+    .modal-box input{padding:0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.95rem;outline:none;font-family:'DM Sans',sans-serif;}
+    .modal-box input:focus{border-color:var(--rose);}
+    .modal-actions{display:flex;gap:0.6rem;justify-content:flex-end;}
+
+    ::-webkit-scrollbar{width:3px;}
+    ::-webkit-scrollbar-thumb{background:rgba(232,99,122,0.4);border-radius:2px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+  </style>
+</head>
+<body>
+
+<!-- HEARTS CONTAINER -->
+<div class="hearts-container" id="hearts-container"></div>
+
+<!-- CELEBRATION OVERLAY -->
+<div id="celebration-overlay">
+  <div class="celebration-bg"></div>
+  <div class="celebration-card" id="celebration-card">
+    <div class="celebration-emoji" id="celeb-emoji">💕</div>
+    <div class="celebration-title" id="celeb-title">Happy Anniversary!</div>
+    <div class="celebration-sub" id="celeb-sub">Kim & Kyla</div>
+    <div class="celebration-years" id="celeb-years"></div>
+    <button class="celebration-close" onclick="closeCelebration()">Continue 💕</button>
+  </div>
+</div>
+
+<!-- REMINDER BANNER -->
+<div id="reminder-banner">
+  <span id="reminder-text"></span>
+  <button id="reminder-close" onclick="closeReminder()">✕</button>
+</div>
+
+<!-- SLIDESHOW -->
+<div id="slideshow-overlay">
+  <button id="ss-close" onclick="closeSlideshow()">✕</button>
+  <img id="slideshow-img" src="" alt="" />
+  <div class="ss-caption" id="ss-caption"></div>
+  <div class="ss-controls">
+    <button class="ss-btn" onclick="ssPrev()">← Prev</button>
+    <span class="ss-counter" id="ss-counter"></span>
+    <button class="ss-btn" id="ss-auto-btn" onclick="toggleAutoPlay()">▶ Auto</button>
+    <button class="ss-btn" onclick="ssNext()">Next →</button>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<!-- ALBUM MODAL -->
+<div id="album-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>✦ New Album</h3>
+    <input type="text" id="album-name-input" placeholder="Album name (e.g. Summer 2024)" />
+    <div class="modal-actions">
+      <button class="btn-danger" onclick="closeAlbumModal()">Cancel</button>
+      <button class="btn-rose" onclick="createAlbum()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-box">
+    <h1>Our Memories 💕</h1>
+    <p class="subtitle">a private place just for us</p>
+    <input type="text" id="email" placeholder="Email" autocomplete="off" />
+    <input type="password" id="password" placeholder="Password (min 6 chars)" autocomplete="off" />
+    <button id="login-btn">Login</button>
+    <button id="register-btn">Create Account</button>
+    <p id="auth-error" class="error"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-page">
+  <nav>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <span class="nav-title">Our Memories 💕</span>
+      <span class="nav-user" id="nav-user-label"></span>
+    </div>
+    <div class="nav-links">
+      <button onclick="showSection('photos')" id="nav-photos">📸 Photos</button>
+      <button onclick="showSection('notes')" id="nav-notes">📝 Notes</button>
+      <button onclick="showSection('timeline')" id="nav-timeline">🗓️ Timeline</button>
+      <button onclick="showSection('messages')" id="nav-messages">💌 Messages</button>
+      <button id="logout-btn">Logout</button>
+    </div>
+  </nav>
+  <main>
+
+    <!-- PHOTOS -->
+    <section id="photos" class="section active">
+      <div id="albums-view">
+        <div class="section-header">
+          <h2>Our Albums 🗂️</h2>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <button class="btn-gold" onclick="openRandomMemory()">🎲 Random Memory</button>
+            <button class="btn-gold" onclick="openSlideshow()">▶ Slideshow</button>
+            <button class="btn-rose" onclick="openAlbumModal()">+ New Album</button>
+          </div>
+        </div>
+        <!-- Random Memory -->
+        <div class="random-memory-card" id="random-memory-card">
+          <div class="random-memory-label">✨ A Memory For You</div>
+          <img id="random-memory-img" src="" alt="" onclick="openLightbox(this.src)" />
+          <div class="random-memory-caption" id="random-memory-caption"></div>
+          <div class="random-memory-time" id="random-memory-time"></div>
+        </div>
+        <div id="albums-grid" class="albums-grid"></div>
+      </div>
+      <div id="album-detail-view" style="display:none;">
+        <button class="album-back-btn" onclick="backToAlbums()">← Back to Albums</button>
+        <div class="section-header">
+          <h2 id="album-detail-title"></h2>
+        </div>
+        <div class="add-form">
+          <input type="file" id="photo-file" accept="image/*" />
+          <input type="text" id="photo-caption" placeholder="Caption (optional)" />
+          <button class="btn-rose" onclick="addPhoto()">Add Photo</button>
+        </div>
+        <div id="photo-grid" class="photo-grid"></div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section id="notes" class="section">
+      <div class="section-header"><h2>Our Notes 📝</h2></div>
+      <div class="add-form">
+        <input type="text" id="note-title" placeholder="Title" />
+        <textarea id="note-body" placeholder="Write something sweet..."></textarea>
+        <button class="btn-rose" onclick="addNote()">Save Note</button>
+      </div>
+      <div id="notes-list" class="notes-list"></div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section id="timeline" class="section">
+      <div class="section-header"><h2>Our Timeline 🗓️</h2></div>
+      <div class="add-form">
+        <input type="text" id="timeline-title" placeholder="Event title" />
+        <input type="date" id="timeline-date" />
+        <input type="text" id="timeline-desc" placeholder="Description (optional)" />
+        <button class="btn-rose" onclick="addTimeline()">Add Event</button>
+      </div>
+      <div id="timeline-list" class="timeline-list"></div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section id="messages" class="section">
+      <div class="section-header"><h2>Our Messages 💌</h2></div>
+      <div id="messages-list" class="messages-list"></div>
+      <div class="message-input-area">
+        <div class="message-input-row">
+          <input type="text" id="message-text" placeholder="Say something sweet..." />
+          <button id="record-btn" title="Hold to record voice message" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">🎙️</button>
+          <button onclick="sendMessage()">Send 💕</button>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-dimmer);padding-left:0.5rem;">Hold 🎙️ to record a voice message</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ── FIREBASE ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCQcl8aF1RT9WuOEjaXrIBEmnLpyrCHGmU",
+  authDomain: "our-memories-366ba.firebaseapp.com",
+  projectId: "our-memories-366ba",
+  storageBucket: "our-memories-366ba.firebasestorage.app",
+  messagingSenderId: "1036976196210",
+  appId: "1:1036976196210:web:959b65c01408f4bb0fd0eb"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ── CONFIG ──
+const ALLOWED_USERS = {
+  'kim@gmail.com': 'Kim',       // ← replace with real emails
+  'kyla@gmail.com': 'Kyla'      // ← replace with real emails
+};
+const ANNIVERSARY = { month: 11, day: 1, year: 2023 }; // Nov 1, 2023
+
+let currentUser = null;
+let currentUserName = '';
+let currentAlbumId = null;
+let photosUnsubscribe = null;
+let allPhotos = []; // for slideshow & random memory
+let ssIndex = 0;
+let ssTimer = null;
+let mediaRecorder = null;
+let audioChunks = [];
+
+// ── AUTH ──
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    currentUser = user;
+    currentUserName = ALLOWED_USERS[user.email.toLowerCase()] || user.email.split('@')[0];
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('app-page').style.display = 'block';
+    document.getElementById('nav-user-label').textContent = '👤 ' + currentUserName;
+    loadAll();
+    checkSpecialDates();
+    requestNotifPermission();
+  } else {
+    currentUser = null;
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('app-page').style.display = 'none';
+  }
+});
+
+document.getElementById('login-btn').onclick = function() {
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('auth-error');
+  err.textContent = '';
+  if (!ALLOWED_USERS[email]) { err.textContent = 'Access denied. This is a private space. 💕'; return; }
+  auth.signInWithEmailAndPassword(email, password).catch(e => { err.textContent = e.message; });
+};
+
+document.getElementById('register-btn').onclick = function() {
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('auth-error');
+  err.textContent = '';
+  if (!ALLOWED_USERS[email]) { err.textContent = 'Registration is private. 💕'; return; }
+  auth.createUserWithEmailAndPassword(email, password).catch(e => { err.textContent = e.message; });
+};
+
+document.getElementById('logout-btn').onclick = () => auth.signOut();
+
+// ── NAV ──
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active-nav'));
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active-nav');
+}
+
+function loadAll() {
+  loadAlbums();
+  loadNotes();
+  loadTimeline();
+  loadMessages();
+  fetchAllPhotos();
+}
+
+// ── SPECIAL DATES ──
+function checkSpecialDates() {
+  const now = new Date();
+  const todayM = now.getMonth() + 1;
+  const todayD = now.getDate();
+  const todayY = now.getFullYear();
+
+  const annivM = ANNIVERSARY.month;
+  const annivD = ANNIVERSARY.day;
+
+  // calc months together
+  const startDate = new Date(ANNIVERSARY.year, ANNIVERSARY.month - 1, ANNIVERSARY.day);
+  const totalMonths = (todayY - ANNIVERSARY.year) * 12 + (todayM - ANNIVERSARY.month);
+  const totalYears = todayY - ANNIVERSARY.year;
+
+  const isAnniversary = todayM === annivM && todayD === annivD;
+  const isMonthsary = todayD === annivD && !isAnniversary; // same day, not the annual one
+  const dayBeforeAnniv = (new Date(todayY, todayM - 1, todayD + 1).getMonth() + 1 === annivM && new Date(todayY, todayM - 1, todayD + 1).getDate() === annivD);
+  const dayBeforeMonthsary = (new Date(todayY, todayM - 1, todayD + 1).getDate() === annivD);
+
+  if (isAnniversary) {
+    showCelebration('anniversary', totalYears);
+    launchHearts(60);
+    sendPushNotification('💕 Happy Anniversary!', `${totalYears} year${totalYears !== 1 ? 's' : ''} together with Kim & Kyla!`);
+  } else if (isMonthsary) {
+    showCelebration('monthsary', totalMonths);
+    launchHearts(40);
+    sendPushNotification('🌸 Happy Monthsary!', `${totalMonths} months together!`);
+  } else if (dayBeforeAnniv) {
+    showReminder('anniversary', totalYears + 1);
+    sendPushNotification('📅 Reminder', `Tomorrow is your anniversary! ${totalYears + 1} year${totalYears + 1 !== 1 ? 's' : ''}! 💕`);
+  } else if (dayBeforeMonthsary) {
+    showReminder('monthsary', totalMonths + 1);
+    sendPushNotification('📅 Reminder', `Tomorrow is your ${totalMonths + 1}-month anniversary! 🌸`);
+  }
+}
+
+function showCelebration(type, count) {
+  const overlay = document.getElementById('celebration-overlay');
+  document.getElementById('celeb-emoji').textContent = type === 'anniversary' ? '💍' : '🌸';
+  document.getElementById('celeb-title').textContent = type === 'anniversary' ? `Happy Anniversary! 💕` : `Happy Monthsary! 🌸`;
+  document.getElementById('celeb-sub').textContent = 'Kim & Kyla';
+  document.getElementById('celeb-years').textContent = type === 'anniversary'
+    ? `${count} beautiful year${count !== 1 ? 's' : ''} together 🥂`
+    : `${count} sweet month${count !== 1 ? 's' : ''} together 💌`;
+  overlay.classList.add('show', 'clickable');
+}
+
+function closeCelebration() {
+  document.getElementById('celebration-overlay').classList.remove('show', 'clickable');
+}
+
+function showReminder(type, count) {
+  const banner = document.getElementById('reminder-banner');
+  const plan = type === 'anniversary'
+    ? `💍 Tomorrow is your ${count}-year Anniversary! What's your plan? 💕`
+    : `🌸 Tomorrow is your ${count}-month Monthsary! What's your plan? 💌`;
+  document.getElementById('reminder-text').textContent = plan;
+  banner.classList.add('show');
+  // auto-hide after 10s
+  setTimeout(() => banner.classList.remove('show'), 10000);
+}
+
+function closeReminder() {
+  document.getElementById('reminder-banner').classList.remove('show');
+}
+
+// ── FLOATING HEARTS ──
+function launchHearts(count) {
+  const container = document.getElementById('hearts-container');
+  const emojis = ['💕','💗','💖','💓','💞','🌸','✨','💝'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'heart-particle';
+      h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      h.style.left = Math.random() * 100 + 'vw';
+      h.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
+      const dur = 4 + Math.random() * 4;
+      h.style.animation = `floatHeart ${dur}s linear forwards`;
+      container.appendChild(h);
+      setTimeout(() => h.remove(), dur * 1000);
+    }, i * 120);
+  }
+}
+
+// ── PUSH NOTIFICATIONS ──
+function requestNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function sendPushNotification(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '💕' });
+  }
+}
+
+// ── LIGHTBOX ──
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src = '';
+}
+document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
+
+// ── RANDOM MEMORY ──
+function fetchAllPhotos() {
+  // listen to all albums then all photos
+  db.collection('albums').get().then(albumSnap => {
+    allPhotos = [];
+    const promises = [];
+    albumSnap.forEach(albumDoc => {
+      promises.push(
+        db.collection('albums').doc(albumDoc.id).collection('photos').get().then(photoSnap => {
+          photoSnap.forEach(pDoc => {
+            const d = pDoc.data();
+            if (d.url) allPhotos.push({ ...d, id: pDoc.id, albumId: albumDoc.id });
+          });
+        })
+      );
+    });
+    return Promise.all(promises);
+  });
+}
+
+function openRandomMemory() {
+  if (!allPhotos.length) { fetchAllPhotos(); setTimeout(openRandomMemory, 800); return; }
+  const pick = allPhotos[Math.floor(Math.random() * allPhotos.length)];
+  const card = document.getElementById('random-memory-card');
+  document.getElementById('random-memory-img').src = pick.url;
+  document.getElementById('random-memory-caption').textContent = pick.caption || '(no caption)';
+  const ts = pick.createdAt ? pick.createdAt.toDate() : new Date();
+  document.getElementById('random-memory-time').textContent = '📅 ' + ts.toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
+  card.classList.add('show');
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── SLIDESHOW ──
+function openSlideshow() {
+  if (!allPhotos.length) { fetchAllPhotos(); setTimeout(openSlideshow, 800); return; }
+  // shuffle
+  for (let i = allPhotos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allPhotos[i], allPhotos[j]] = [allPhotos[j], allPhotos[i]];
+  }
+  ssIndex = 0;
+  document.getElementById('slideshow-overlay').classList.add('open');
+  showSlide(0);
+}
+
+function showSlide(idx) {
+  if (!allPhotos.length) return;
+  ssIndex = (idx + allPhotos.length) % allPhotos.length;
+  const p = allPhotos[ssIndex];
+  const img = document.getElementById('slideshow-img');
+  img.style.animation = 'none';
+  img.offsetHeight;
+  img.style.animation = 'ssIn 0.5s ease';
+  img.src = p.url;
+  document.getElementById('ss-caption').textContent = p.caption || '';
+  document.getElementById('ss-counter').textContent = (ssIndex + 1) + ' / ' + allPhotos.length;
+}
+
+function ssPrev() { showSlide(ssIndex - 1); }
+function ssNext() { showSlide(ssIndex + 1); }
+
+function toggleAutoPlay() {
+  const btn = document.getElementById('ss-auto-btn');
+  if (ssTimer) {
+    clearInterval(ssTimer);
+    ssTimer = null;
+    btn.classList.remove('active');
+    btn.textContent = '▶ Auto';
+  } else {
+    ssTimer = setInterval(() => ssNext(), 3000);
+    btn.classList.add('active');
+    btn.textContent = '⏸ Stop';
+  }
+}
+
+function closeSlideshow() {
+  if (ssTimer) { clearInterval(ssTimer); ssTimer = null; }
+  document.getElementById('slideshow-overlay').classList.remove('open');
+  document.getElementById('ss-auto-btn').classList.remove('active');
+  document.getElementById('ss-auto-btn').textContent = '▶ Auto';
+}
+
+// ── ALBUMS ──
+function openAlbumModal() {
+  document.getElementById('album-modal').classList.add('open');
+  document.getElementById('album-name-input').value = '';
+  setTimeout(() => document.getElementById('album-name-input').focus(), 100);
+}
+function closeAlbumModal() { document.getElementById('album-modal').classList.remove('open'); }
+
+function createAlbum() {
+  const name = document.getElementById('album-name-input').value.trim();
+  if (!name) return;
+  db.collection('albums').add({ name, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).then(closeAlbumModal);
+}
+
+function loadAlbums() {
+  db.collection('albums').orderBy('createdAt','asc').onSnapshot(snap => {
+    const grid = document.getElementById('albums-grid');
+    grid.innerHTML = '';
+    if (snap.empty) {
+      grid.innerHTML = '<p style="color:var(--text-dim);font-style:italic;grid-column:1/-1;">No albums yet. Create your first album above! 💕</p>';
+      return;
+    }
+    snap.forEach(doc => {
+      const d = doc.data();
+      const emojis = ['🌸','🌷','💐','🌺','🌻','🌹','💕','✨','🦋','🌙'];
+      const icon = emojis[doc.id.charCodeAt(0) % emojis.length];
+      grid.innerHTML += `
+        <div class="album-card" onclick="openAlbum('${doc.id}','${escHtml(d.name)}')">
+          <button class="album-del" onclick="event.stopPropagation();deleteAlbum('${doc.id}')" title="Delete album">✕</button>
+          <div class="album-icon">${icon}</div>
+          <div class="album-name">${escHtml(d.name)}</div>
+          <div class="album-count" id="album-count-${doc.id}">...</div>
+        </div>`;
+      db.collection('albums').doc(doc.id).collection('photos').get().then(ps => {
+        const el = document.getElementById('album-count-' + doc.id);
+        if (el) el.textContent = ps.size + ' photo' + (ps.size !== 1 ? 's' : '');
+      });
+    });
+  });
+}
+
+function openAlbum(albumId, albumName) {
+  currentAlbumId = albumId;
+  document.getElementById('albums-view').style.display = 'none';
+  document.getElementById('album-detail-view').style.display = 'block';
+  document.getElementById('album-detail-title').textContent = albumName;
+  loadPhotos(albumId);
+}
+
+function backToAlbums() {
+  if (photosUnsubscribe) { photosUnsubscribe(); photosUnsubscribe = null; }
+  currentAlbumId = null;
+  document.getElementById('album-detail-view').style.display = 'none';
+  document.getElementById('albums-view').style.display = 'block';
+  document.getElementById('photo-grid').innerHTML = '';
+  fetchAllPhotos();
+}
+
+function deleteAlbum(albumId) {
+  if (!confirm('Delete this album and all its photos?')) return;
+  db.collection('albums').doc(albumId).collection('photos').get().then(snap => {
+    const batch = db.batch();
+    snap.forEach(doc => batch.delete(doc.ref));
+    return batch.commit();
+  }).then(() => db.collection('albums').doc(albumId).delete());
+}
+
+// ── PHOTOS ──
+function addPhoto() {
+  if (!currentAlbumId) return;
+  const file = document.getElementById('photo-file').files[0];
+  const caption = document.getElementById('photo-caption').value.trim();
+  if (!file) { alert('Please select a photo!'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    db.collection('albums').doc(currentAlbumId).collection('photos').add({
+      url: e.target.result, caption,
+      uploader: currentUserName,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      document.getElementById('photo-file').value = '';
+      document.getElementById('photo-caption').value = '';
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadPhotos(albumId) {
+  if (photosUnsubscribe) photosUnsubscribe();
+  photosUnsubscribe = db.collection('albums').doc(albumId).collection('photos')
+    .orderBy('createdAt','desc').onSnapshot(snap => {
+      const grid = document.getElementById('photo-grid');
+      grid.innerHTML = '';
+      if (snap.empty) { grid.innerHTML = '<p style="color:var(--text-dim);font-style:italic;">No photos yet. Add your first one! 📸</p>'; return; }
+      snap.forEach(doc => {
+        const d = doc.data();
+        const ts = d.createdAt ? d.createdAt.toDate() : new Date();
+        const timeStr = ts.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + ts.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        grid.innerHTML += buildPhotoCard(doc.id, d, timeStr, albumId);
+      });
+      snap.forEach(doc => loadComments(albumId, doc.id));
+    });
+}
+
+function buildPhotoCard(photoId, d, timeStr, albumId) {
+  return `<div class="photo-card" id="photo-card-${photoId}">
+    <div class="photo-thumb-wrap" onclick="openLightbox('${escAttr(d.url)}')">
+      <img src="${escAttr(d.url)}" onerror="this.src='https://placehold.co/400x300?text=Photo'" alt="${escHtml(d.caption||'')}" loading="lazy"/>
+      <div class="photo-overlay"><span style="color:white;font-size:0.8rem;">🔍 View full</span></div>
+    </div>
+    <div class="photo-meta">
+      <div class="photo-caption-text" id="caption-text-${photoId}">${escHtml(d.caption||'')}</div>
+      <div class="photo-time">📅 ${timeStr} · by ${escHtml(d.uploader||'')}</div>
+    </div>
+    <div class="photo-actions">
+      <button class="btn-gold" onclick="toggleEditCaption('${photoId}','${escAttr(d.caption||'')}')">✏️ Edit</button>
+      <button class="btn-danger" onclick="deletePhoto('${albumId}','${photoId}')">🗑 Remove</button>
+    </div>
+    <div id="edit-caption-row-${photoId}" class="edit-caption-row" style="display:none;">
+      <input type="text" id="edit-caption-input-${photoId}" value="${escAttr(d.caption||'')}" placeholder="New caption"/>
+      <button onclick="saveCaption('${albumId}','${photoId}')">Save</button>
+    </div>
+    <div class="photo-comments-section">
+      <div class="comments-list" id="comments-${photoId}"></div>
+      <div class="comment-input-row">
+        <input type="text" id="comment-input-${photoId}" placeholder="Add a comment..." onkeydown="if(event.key==='Enter')addComment('${albumId}','${photoId}')"/>
+        <button onclick="addComment('${albumId}','${photoId}')">💬</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleEditCaption(photoId) {
+  const row = document.getElementById('edit-caption-row-' + photoId);
+  row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+  if (row.style.display === 'flex') document.getElementById('edit-caption-input-' + photoId).focus();
+}
+
+function saveCaption(albumId, photoId) {
+  const val = document.getElementById('edit-caption-input-' + photoId).value.trim();
+  db.collection('albums').doc(albumId).collection('photos').doc(photoId).update({ caption: val }).then(() => {
+    document.getElementById('caption-text-' + photoId).textContent = val;
+    document.getElementById('edit-caption-row-' + photoId).style.display = 'none';
+  });
+}
+
+function deletePhoto(albumId, photoId) {
+  if (!confirm('Remove this photo?')) return;
+  db.collection('albums').doc(albumId).collection('photos').doc(photoId).delete();
+}
+
+// ── COMMENTS ──
+function loadComments(albumId, photoId) {
+  db.collection('albums').doc(albumId).collection('photos').doc(photoId)
+    .collection('comments').orderBy('createdAt','asc').onSnapshot(snap => {
+      const list = document.getElementById('comments-' + photoId);
+      if (!list) return;
+      list.innerHTML = '';
+      snap.forEach(cdoc => {
+        const c = cdoc.data();
+        const isMine = c.senderName === currentUserName;
+        list.innerHTML += `<div class="comment-item">
+          <span class="comment-sender">${escHtml(c.senderName||c.sender)}</span>
+          <span>${escHtml(c.text)}</span>
+          ${isMine ? `<button class="comment-del" onclick="deleteComment('${albumId}','${photoId}','${cdoc.id}')">✕</button>` : ''}
+        </div>`;
+      });
+      list.scrollTop = list.scrollHeight;
+    });
+}
+
+function addComment(albumId, photoId) {
+  const input = document.getElementById('comment-input-' + photoId);
+  const text = input.value.trim();
+  if (!text || !currentUser) return;
+  db.collection('albums').doc(albumId).collection('photos').doc(photoId)
+    .collection('comments').add({ text, sender: currentUser.email, senderName: currentUserName, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  input.value = '';
+}
+
+function deleteComment(albumId, photoId, commentId) {
+  db.collection('albums').doc(albumId).collection('photos').doc(photoId).collection('comments').doc(commentId).delete();
+}
+
+// ── NOTES ──
+function addNote() {
+  const title = document.getElementById('note-title').value.trim();
+  const body = document.getElementById('note-body').value.trim();
+  if (!title && !body) return;
+  db.collection('notes').add({ title, body, author: currentUserName, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-body').value = '';
+}
+
+function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  db.collection('notes').doc(id).delete();
+}
+
+function loadNotes() {
+  db.collection('notes').orderBy('createdAt','desc').onSnapshot(snap => {
+    const list = document.getElementById('notes-list');
+    list.innerHTML = '';
+    if (snap.empty) { list.innerHTML = '<p style="color:var(--text-dim);font-style:italic;">No notes yet. Write something sweet! 📝</p>'; return; }
+    snap.forEach(doc => {
+      const d = doc.data();
+      const ts = d.createdAt ? d.createdAt.toDate() : new Date();
+      list.innerHTML += `<div class="note-card">
+        <h3>${escHtml(d.title||'')}</h3>
+        <div class="note-time">📅 ${ts.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · by ${escHtml(d.author||'')}</div>
+        <p>${escHtml(d.body||'')}</p>
+        <div class="note-card-actions"><button class="btn-danger" onclick="deleteNote('${doc.id}')">🗑 Delete</button></div>
+      </div>`;
+    });
+  });
+}
+
+// ── TIMELINE ──
+function addTimeline() {
+  const title = document.getElementById('timeline-title').value.trim();
+  const date = document.getElementById('timeline-date').value;
+  const desc = document.getElementById('timeline-desc').value.trim();
+  if (!title) return;
+  db.collection('timeline').add({ title, date, desc, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  document.getElementById('timeline-title').value = '';
+  document.getElementById('timeline-date').value = '';
+  document.getElementById('timeline-desc').value = '';
+}
+
+function deleteTimeline(id) {
+  if (!confirm('Delete this event?')) return;
+  db.collection('timeline').doc(id).delete();
+}
+
+function loadTimeline() {
+  db.collection('timeline').orderBy('createdAt','desc').onSnapshot(snap => {
+    const list = document.getElementById('timeline-list');
+    list.innerHTML = '';
+    if (snap.empty) { list.innerHTML = '<p style="color:var(--text-dim);font-style:italic;">No events yet. Add your first milestone! 🗓️</p>'; return; }
+    snap.forEach(doc => {
+      const d = doc.data();
+      list.innerHTML += `<div class="timeline-card">
+        <div class="timeline-date">📅 ${d.date||'—'}</div>
+        <div class="timeline-body">
+          <h3>${escHtml(d.title)}</h3>
+          <p>${escHtml(d.desc||'')}</p>
+          <div class="timeline-card-actions"><button class="btn-danger" onclick="deleteTimeline('${doc.id}')">🗑 Delete</button></div>
+        </div>
+      </div>`;
+    });
+  });
+}
+
+// ── MESSAGES ──
+function sendMessage(voiceUrl) {
+  if (voiceUrl) {
+    if (!currentUser) return;
+    db.collection('messages').add({ type:'voice', audioUrl: voiceUrl, sender: currentUser.email, senderName: currentUserName, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    return;
+  }
+  const text = document.getElementById('message-text').value.trim();
+  if (!text || !currentUser) return;
+  db.collection('messages').add({ type:'text', text, sender: currentUser.email, senderName: currentUserName, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  document.getElementById('message-text').value = '';
+}
+
+document.getElementById('message-text').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+function loadMessages() {
+  db.collection('messages').orderBy('createdAt','asc').onSnapshot(snap => {
+    const list = document.getElementById('messages-list');
+    list.innerHTML = '';
+    snap.forEach(doc => {
+      const d = doc.data();
+      const isMine = d.sender === currentUser.email;
+      const ts = d.createdAt ? d.createdAt.toDate() : new Date();
+      const timeStr = ts.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+      let content = '';
+      if (d.type === 'voice' && d.audioUrl) {
+        content = `<div class="voice-bubble"><span>🎙️</span><audio controls src="${escAttr(d.audioUrl)}"></audio></div>`;
+      } else {
+        content = escHtml(d.text||'');
+      }
+      list.innerHTML += `<div class="message-bubble ${isMine?'mine':'theirs'}">
+        <div class="msg-sender">${escHtml(d.senderName||d.sender)}</div>
+        ${content}
+        <div class="msg-time">${timeStr}</div>
+      </div>`;
+    });
+    list.scrollTop = list.scrollHeight;
+  });
+}
+
+// ── VOICE RECORDING ──
+async function startRecording() {
+  const btn = document.getElementById('record-btn');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const reader = new FileReader();
+      reader.onload = () => sendMessage(reader.result);
+      reader.readAsDataURL(blob);
+      stream.getTracks().forEach(t => t.stop());
+    };
+    mediaRecorder.start();
+    btn.classList.add('recording');
+    btn.textContent = '⏹️';
+  } catch (err) {
+    alert('Microphone access denied. Please allow mic access to send voice messages.');
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+    const btn = document.getElementById('record-btn');
+    btn.classList.remove('recording');
+    btn.textContent = '🎙️';
+  }
+}
+
+// ── UTILS ──
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function escAttr(str) {
+  return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,'').replace(/\r/g,'');
+}
+
+// keyboard close
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeLightbox(); closeSlideshow(); closeCelebration(); }
+});
+</script>
+</body>
+</html>
