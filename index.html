@@ -1115,58 +1115,71 @@ function sendMessage(voiceUrl) {
 
 document.getElementById('message-text').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-function loadMessages(){
-  if (messagesUnsubscribe) messagesUnsubscribe();
-  db.collection('presence').doc(currentUser.email).get().then(myDoc => {
-    const myPhoto = myDoc.exists && myDoc.data().photoUrl ? myDoc.data().photoUrl : null;
-    const partnerEmail = Object.keys(ALLOWED_USERS).find(e => e !== currentUser.email.toLowerCase());
-    db.collection('presence').doc(partnerEmail).get().then(partnerDoc => {
-      const partnerPhoto = partnerDoc.exists && partnerDoc.data().photoUrl ? partnerDoc.data().photoUrl : null;
+// Cache for avatar photos, updated live
+const avatarCache = {};
 
-      messagesUnsubscribe = db.collection('messages').orderBy('createdAt','asc').onSnapshot(snap=>{
-        const list=document.getElementById('messages-list');
-        list.innerHTML='';
-        const docs = snap.docs;
-        docs.forEach((doc,i)=>{
-          const d=doc.data();
-          const isMine=d.sender===currentUser.email;
-          const ts=d.createdAt?d.createdAt.toDate():new Date();
-          const timeStr=ts.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-          const photo = isMine ? myPhoto : partnerPhoto;
-          const initials = (d.senderName||'?').charAt(0);
-          const avatarHtml = photo
-            ? `<img class="msg-avatar" src="${escAttr(photo)}" alt=""/>`
-            : `<div class="msg-avatar-placeholder">${escHtml(initials)}</div>`;
-          let content='';
-          if(d.type==='voice'&&d.audioUrl){
-            content=`<div class="voice-bubble"><span>🎙️</span><audio controls src="${escAttr(d.audioUrl)}"></audio></div>`;
-          } else {
-            content=escHtml(d.text||'');
-          }
-          let seenHtml='';
-          if(isMine){
-            const isLast = docs.slice(i+1).every(nd=>nd.data().sender!==currentUser.email);
-            if(isLast){
-              seenHtml=`<div class="msg-meta"><span class="msg-time">${timeStr}</span><span class="msg-seen ${d.seen?'seen':'delivered'}">${d.seen?'✓✓ Seen':'✓ Sent'}</span></div>`;
-            } else {
-              seenHtml=`<div class="msg-time">${timeStr}</div>`;
-            }
-          } else {
-            seenHtml=`<div class="msg-time">${timeStr}</div>`;
-          }
-          list.innerHTML+=`<div class="msg-row ${isMine?'mine':'theirs'}">
-            ${avatarHtml}
-            <div class="msg-bubble-wrap">
-              <div class="msg-sender">${escHtml(d.senderName||d.sender)}</div>
-              <div class="message-bubble ${isMine?'mine':'theirs'}">${content}</div>
-              ${seenHtml}
-            </div>
-          </div>`;
-        });
-        list.scrollTop=list.scrollHeight;
-        if(document.getElementById('messages').classList.contains('active')) markMessagesSeen();
+function watchAvatars() {
+  Object.keys(ALLOWED_USERS).forEach(email => {
+    db.collection('presence').doc(email).onSnapshot(doc => {
+      avatarCache[email] = doc.exists && doc.data().photoUrl ? doc.data().photoUrl : null;
+      // Re-render all avatar imgs in the message list live
+      document.querySelectorAll(`.msg-avatar-live[data-email="${email}"]`).forEach(el => {
+        if (avatarCache[email]) {
+          el.outerHTML = `<img class="msg-avatar msg-avatar-live" data-email="${email}" src="${escAttr(avatarCache[email])}" alt=""/>`;
+        }
       });
     });
+  });
+}
+
+function loadMessages(){
+  if (messagesUnsubscribe) messagesUnsubscribe();
+  // Start watching avatars live
+  watchAvatars();
+
+  messagesUnsubscribe = db.collection('messages').orderBy('createdAt','asc').onSnapshot(snap=>{
+    const list=document.getElementById('messages-list');
+    list.innerHTML='';
+    const docs = snap.docs;
+    docs.forEach((doc,i)=>{
+      const d=doc.data();
+      const isMine=d.sender===currentUser.email;
+      const ts=d.createdAt?d.createdAt.toDate():new Date();
+      const timeStr=ts.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+      // Always pull latest photo from live cache
+      const photo = avatarCache[d.sender] || null;
+      const initials = (d.senderName||'?').charAt(0);
+      const avatarHtml = photo
+        ? `<img class="msg-avatar msg-avatar-live" data-email="${escAttr(d.sender)}" src="${escAttr(photo)}" alt=""/>`
+        : `<div class="msg-avatar-placeholder msg-avatar-live" data-email="${escAttr(d.sender)}">${escHtml(initials)}</div>`;
+      let content='';
+      if(d.type==='voice'&&d.audioUrl){
+        content=`<div class="voice-bubble"><span>🎙️</span><audio controls src="${escAttr(d.audioUrl)}"></audio></div>`;
+      } else {
+        content=escHtml(d.text||'');
+      }
+      let seenHtml='';
+      if(isMine){
+        const isLast = docs.slice(i+1).every(nd=>nd.data().sender!==currentUser.email);
+        if(isLast){
+          seenHtml=`<div class="msg-meta"><span class="msg-time">${timeStr}</span><span class="msg-seen ${d.seen?'seen':'delivered'}">${d.seen?'✓✓ Seen':'✓ Sent'}</span></div>`;
+        } else {
+          seenHtml=`<div class="msg-time">${timeStr}</div>`;
+        }
+      } else {
+        seenHtml=`<div class="msg-time">${timeStr}</div>`;
+      }
+      list.innerHTML+=`<div class="msg-row ${isMine?'mine':'theirs'}">
+        ${avatarHtml}
+        <div class="msg-bubble-wrap">
+          <div class="msg-sender">${escHtml(d.senderName||d.sender)}</div>
+          <div class="message-bubble ${isMine?'mine':'theirs'}">${content}</div>
+          ${seenHtml}
+        </div>
+      </div>`;
+    });
+    list.scrollTop=list.scrollHeight;
+    if(document.getElementById('messages').classList.contains('active')) markMessagesSeen();
   });
 }
 
