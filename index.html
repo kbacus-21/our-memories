@@ -319,6 +319,17 @@
     .flappy-wrap{display:flex;flex-direction:column;align-items:center;gap:0.8rem;}
     #flappy-canvas{width:100%;max-width:420px;height:520px;background:linear-gradient(180deg,rgba(232,99,122,0.16),rgba(30,10,50,0.82));border:1px solid var(--border-hover);border-radius:18px;box-shadow:0 16px 45px rgba(0,0,0,0.45);touch-action:manipulation;}
     .flappy-help{text-align:center;color:var(--text-dim);font-size:0.85rem;}
+
+    .pong-wrap{display:flex;flex-direction:column;align-items:center;gap:0.8rem;}
+    #pong-canvas{width:100%;max-width:720px;height:420px;background:linear-gradient(180deg,rgba(14,11,20,0.98),rgba(30,10,50,0.92));border:1px solid var(--border-hover);border-radius:18px;box-shadow:0 16px 45px rgba(0,0,0,0.45);touch-action:none;}
+    .pong-help{text-align:center;color:var(--text-dim);font-size:0.85rem;line-height:1.5;}
+    .pong-scoreboard{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;width:100%;}
+    .pong-player-score{min-width:120px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:0.8rem 1rem;}
+    .pong-player-score strong{display:block;color:var(--gold);font-size:1.7rem;line-height:1;}
+    .pong-player-score span{display:block;color:var(--text-dim);font-size:0.78rem;margin-top:0.35rem;}
+    .pong-vs{color:var(--rose);font-family:'Cormorant Garamond',serif;font-size:1.5rem;}
+    .pong-mode-btn.active{background:rgba(232,99,122,0.18)!important;border-color:var(--rose)!important;color:var(--text)!important;}
+    .pong-settings-note{font-size:0.78rem;color:var(--text-dimmer);margin-top:0.4rem;}
     .game-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.7rem;margin-top:1rem;}
     .game-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:0.8rem;text-align:center;}
     .game-stat strong{display:block;color:var(--gold);font-size:1.1rem;}
@@ -340,7 +351,7 @@
     .mini-chat-input-row input{flex:1;padding:0.55rem 0.75rem;border-radius:50px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);outline:none;font-family:'DM Sans',sans-serif;font-size:0.82rem;}
     .mini-chat-input-row button{padding:0.5rem 0.7rem;border-radius:50px;border:none;background:var(--rose);color:#fff;cursor:pointer;font-size:0.78rem;}
     .game-toast{position:fixed;right:1.5rem;bottom:6.2rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;padding:0.75rem 1.1rem;border-radius:50px;box-shadow:0 8px 24px rgba(232,99,122,0.45);z-index:5100;font-size:0.85rem;animation:toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;}
-    @media(max-width:800px){.games-layout{grid-template-columns:1fr;}.games-library{grid-template-columns:1fr;}.mini-game-chat{left:1rem;right:1rem;width:auto;}.scramble-display{font-size:2rem;}#flappy-canvas{height:460px;}}
+    @media(max-width:800px){.games-layout{grid-template-columns:1fr;}.games-library{grid-template-columns:1fr;}.mini-game-chat{left:1rem;right:1rem;width:auto;}.scramble-display{font-size:2rem;}#flappy-canvas{height:460px;}#pong-canvas{height:320px;}}
 
 
     ::-webkit-scrollbar{width:3px;}
@@ -561,11 +572,11 @@
 
       <div id="games-library-view">
         <div class="games-library">
-          <div class="game-select-card" onclick="openGame('word')">
+          <div class="game-select-card" onclick="openGame('pong')">
             <div>
-              <div class="game-select-icon">🔤</div>
-              <h3>Word Scramble</h3>
-              <p>Unscramble shared words from your own couple word bank. Fastest average time wins.</p>
+              <div class="game-select-icon">🏓</div>
+              <h3>Pong Battle</h3>
+              <p>Classic ping pong. Play 1v1 on one keyboard or practice against AI when your partner is offline.</p>
             </div>
             <div class="game-select-footer">Play now →</div>
           </div>
@@ -596,47 +607,54 @@
         </div>
       </div>
 
-      <div id="word-game-view" class="game-view">
+      <div id="pong-game-view" class="game-view">
         <button class="game-back-btn" onclick="backToGameLibrary()">← Back to Games</button>
         <div class="games-layout">
           <div>
             <div class="game-card">
-              <h3>Word Scramble 🔤</h3>
-              <p>Add your own words to the shared word bank, then race to unscramble them. The fastest average time steals the crown.</p>
-              <div class="scramble-display" id="scramble-display">READY</div>
-              <div class="game-row">
-                <input type="text" id="scramble-answer" placeholder="Type the correct word here" autocomplete="off"/>
-                <button class="btn-rose" onclick="startWordScramble()">Start Round</button>
-                <button class="btn-gold" onclick="submitWordScramble()">Submit</button>
-              </div>
-              <p id="scramble-feedback" style="margin-top:0.8rem;color:var(--gold);"></p>
-              <div class="game-stat-grid">
-                <div class="game-stat"><strong id="timer-display">0.00s</strong><span>Your time</span></div>
-                <div class="game-stat"><strong id="my-average-display">--</strong><span>Your avg</span></div>
-                <div class="game-stat"><strong id="partner-average-display">--</strong><span>Partner avg</span></div>
-              </div>
-            </div>
+              <h3>Pong Battle 🏓</h3>
+              <p>Choose your mode, set the score needed to win, then start the match. No power-ups yet — pure skill first, chaos later.</p>
 
-            <div class="game-card">
-              <h3>Shared Word Bank 💬</h3>
-              <p>Use places, nicknames, pet names, funny words, and inside jokes.</p>
               <div class="game-row">
-                <input type="text" id="word-bank-input" placeholder="Example: Butong, baby, mango, date night" autocomplete="off"/>
-                <button class="btn-rose" onclick="addWordBankWord()">Add Word</button>
+                <button class="btn-gold pong-mode-btn active" id="pong-mode-ai" onclick="setPongMode('ai')">Practice vs AI</button>
+                <button class="btn-gold pong-mode-btn" id="pong-mode-local" onclick="setPongMode('local')">1v1 Same Keyboard</button>
               </div>
-              <div id="word-bank-list" class="word-bank-list"></div>
+
+              <div class="game-row">
+                <label style="color:var(--text-dim);font-size:0.9rem;">Score to win</label>
+                <input type="number" id="pong-score-to-win" min="1" max="50" value="5" autocomplete="off"/>
+                <button class="btn-rose" onclick="startPongGame()">Start Match</button>
+                <button class="btn-gold" onclick="pausePongGame()">Pause</button>
+                <button class="btn-danger" onclick="resetPongGame()">Reset</button>
+              </div>
+              <div class="pong-settings-note">You can change the score target before each match. Example: first to 5, then next match first to 10.</div>
+
+              <div class="pong-scoreboard" style="margin-top:1rem;">
+                <div class="pong-player-score"><strong id="pong-left-score">0</strong><span id="pong-left-name">You</span></div>
+                <div class="pong-vs">VS</div>
+                <div class="pong-player-score"><strong id="pong-right-score">0</strong><span id="pong-right-name">AI</span></div>
+              </div>
+
+              <div class="pong-wrap" style="margin-top:1rem;">
+                <canvas id="pong-canvas" width="720" height="420"></canvas>
+                <div class="pong-help" id="pong-status">Practice vs AI: use W/S or ↑/↓ to move. 1v1: Player 1 uses W/S, Player 2 uses ↑/↓.</div>
+              </div>
             </div>
           </div>
 
           <div>
             <div class="game-card">
-              <h3>Word Scramble Leaderboard 👑</h3>
-              <p id="leaderboard-summary">Play a round to start the battle.</p>
-              <div id="game-score-list" class="score-list"></div>
+              <h3>Pong Leaderboard 👑</h3>
+              <div class="game-stat-grid">
+                <div class="game-stat"><strong id="my-pong-wins">--</strong><span>Your wins</span></div>
+                <div class="game-stat"><strong id="partner-pong-wins">--</strong><span>Partner wins</span></div>
+                <div class="game-stat"><strong id="pong-target-display">5</strong><span>Score to win</span></div>
+              </div>
+              <div id="pong-score-list" class="score-list"></div>
             </div>
             <div class="game-card">
               <h3>Game Actions 😂</h3>
-              <p>Distract each other a little. Love is war, but cute.</p>
+              <p>Use the mini chat to call the match before playing online/same-keyboard. Respectfully trash talk, obviously.</p>
               <div class="game-row">
                 <button class="btn-rose" onclick="pokePartner()">Poke Partner 💕</button>
                 <button class="btn-gold" onclick="toggleMiniGameChat(true)">Open Mini Chat 💬</button>
@@ -1565,7 +1583,7 @@ function escAttr(str){return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&
 
 document.addEventListener('keydown', e => { if(e.key==='Escape'){closeLightbox();closeSlideshow();closeCelebration();} });
 
-// ── GAMES: HUB + WORD SCRAMBLE + FLAPPY LOVE + MINI CHAT ──
+// ── GAMES: HUB + PONG BATTLE + FLAPPY LOVE + MINI CHAT ──
 let flappyCanvas = null, flappyCtx = null, flappyRunning = false, flappyLoopId = null;
 let flappyBird = null, flappyPipes = [], flappyScore = 0, flappyFrame = 0, flappySavedThisRound = false;
 
@@ -1575,11 +1593,11 @@ function getPartnerEmail() {
 }
 
 function loadGames() {
-  loadWordBank();
   watchGameScores();
   watchGameChat();
   watchGamePresence();
   watchGameActivities();
+  drawPongIdle();
   drawFlappyIdle();
 }
 
@@ -1588,26 +1606,30 @@ function cleanupGames() {
     if (typeof unsub === 'function') unsub();
   });
   wordBankUnsubscribe = gameScoresUnsubscribe = gameChatUnsubscribe = gamePresenceUnsubscribe = gameActivityUnsubscribe = null;
-  if (currentScrambleTimer) clearInterval(currentScrambleTimer);
+  stopPongLoop();
   stopFlappyLoop();
 }
 
 function openGame(game) {
   document.getElementById('games-library-view').style.display = 'none';
-  document.getElementById('word-game-view').classList.toggle('active', game === 'word');
+  document.getElementById('pong-game-view').classList.toggle('active', game === 'pong');
   document.getElementById('flappy-game-view').classList.toggle('active', game === 'flappy');
   toggleMiniGameChat(true);
-  setGamePresence(true, game === 'word' ? 'Word Scramble' : 'Flappy Love');
-  notifyPartnerActivity(currentUserName + ' just opened ' + (game === 'word' ? 'Word Scramble 🔤' : 'Flappy Love 🐦'));
+  const gameName = game === 'pong' ? 'Pong Battle' : 'Flappy Love';
+  setGamePresence(true, gameName);
+  notifyPartnerActivity(currentUserName + ' just opened ' + (game === 'pong' ? 'Pong Battle 🏓' : 'Flappy Love 🐦'));
+  if (game === 'pong') setTimeout(drawPongIdle, 60);
   if (game === 'flappy') setTimeout(drawFlappyIdle, 60);
 }
 
 function backToGameLibrary() {
   document.getElementById('games-library-view').style.display = 'block';
-  document.getElementById('word-game-view').classList.remove('active');
+  document.getElementById('pong-game-view').classList.remove('active');
   document.getElementById('flappy-game-view').classList.remove('active');
   setGamePresence(false, 'Games Menu');
+  stopPongLoop();
   stopFlappyLoop();
+  drawPongIdle();
   drawFlappyIdle();
 }
 
@@ -1727,6 +1749,312 @@ function submitWordScramble() {
     notifyPartnerActivity(currentUserName + ' finished Word Scramble in ' + (timeMs / 1000).toFixed(2) + 's 🔥');
   });
 }
+
+
+// ── PONG BATTLE ──
+let pongCanvas = null, pongCtx = null, pongRunning = false, pongLoopId = null;
+let pongMode = 'ai';
+let pongScoreToWin = 5;
+let pongWinnerSaved = false;
+let pongKeys = { w:false, s:false, up:false, down:false };
+let pongState = null;
+
+function initPongCanvas() {
+  pongCanvas = document.getElementById('pong-canvas');
+  if (!pongCanvas) return false;
+  pongCtx = pongCanvas.getContext('2d');
+  return true;
+}
+
+function setPongMode(mode) {
+  if (pongRunning) return;
+  pongMode = mode === 'local' ? 'local' : 'ai';
+  document.getElementById('pong-mode-ai')?.classList.toggle('active', pongMode === 'ai');
+  document.getElementById('pong-mode-local')?.classList.toggle('active', pongMode === 'local');
+  updatePongNames();
+  drawPongIdle();
+}
+
+function updatePongNames() {
+  const partnerName = ALLOWED_USERS[getPartnerEmail()] || 'Partner';
+  const leftName = document.getElementById('pong-left-name');
+  const rightName = document.getElementById('pong-right-name');
+  if (leftName) leftName.textContent = currentUserName || 'Player 1';
+  if (rightName) rightName.textContent = pongMode === 'ai' ? 'AI' : partnerName;
+}
+
+function getPongTargetFromInput() {
+  const input = document.getElementById('pong-score-to-win');
+  let value = parseInt(input?.value || '5', 10);
+  if (!Number.isFinite(value)) value = 5;
+  value = Math.max(1, Math.min(50, value));
+  if (input) input.value = value;
+  const targetDisplay = document.getElementById('pong-target-display');
+  if (targetDisplay) targetDisplay.textContent = String(value);
+  return value;
+}
+
+function createPongState() {
+  const w = 720, h = 420;
+  return {
+    w, h,
+    left: { x: 26, y: h/2 - 48, width: 12, height: 96, score: 0 },
+    right: { x: w - 38, y: h/2 - 48, width: 12, height: 96, score: 0 },
+    ball: { x: w/2, y: h/2, r: 8, vx: 5 * (Math.random() > 0.5 ? 1 : -1), vy: (Math.random() * 4) - 2 },
+    paddleSpeed: 7,
+    maxBallSpeed: 11
+  };
+}
+
+function resetPongBall(direction) {
+  if (!pongState) return;
+  const b = pongState.ball;
+  b.x = pongState.w / 2;
+  b.y = pongState.h / 2;
+  b.vx = 5 * direction;
+  b.vy = (Math.random() * 4) - 2;
+}
+
+function startPongGame() {
+  if (!currentUser) return;
+  pongScoreToWin = getPongTargetFromInput();
+  pongWinnerSaved = false;
+  pongState = createPongState();
+  updatePongNames();
+  updatePongScoreUI();
+  const input = document.getElementById('pong-score-to-win');
+  if (input) input.disabled = true;
+  pongRunning = true;
+  setGamePresence(true, 'Pong Battle');
+  notifyPartnerActivity(currentUserName + ' started a Pong Battle first to ' + pongScoreToWin + ' 🏓');
+  document.getElementById('pong-status').textContent = pongMode === 'ai'
+    ? 'Match started. Use W/S or ↑/↓ to move your paddle.'
+    : 'Match started. Player 1: W/S. Player 2: ↑/↓.';
+  stopPongLoop();
+  pongLoop();
+}
+
+function pausePongGame() {
+  if (!pongState) return;
+  pongRunning = !pongRunning;
+  document.getElementById('pong-status').textContent = pongRunning ? 'Match resumed.' : 'Paused. Click Pause again to resume.';
+  if (pongRunning) pongLoop(); else stopPongLoop();
+}
+
+function resetPongGame() {
+  stopPongLoop();
+  pongRunning = false;
+  pongState = createPongState();
+  pongState.left.score = 0;
+  pongState.right.score = 0;
+  const input = document.getElementById('pong-score-to-win');
+  if (input) input.disabled = false;
+  updatePongScoreUI();
+  drawPongIdle();
+  document.getElementById('pong-status').textContent = 'Reset. Choose score to win, then start again.';
+}
+
+function stopPongLoop() {
+  if (pongLoopId) cancelAnimationFrame(pongLoopId);
+  pongLoopId = null;
+}
+
+function clampPaddle(p) {
+  p.y = Math.max(0, Math.min(pongState.h - p.height, p.y));
+}
+
+function updatePongScoreUI() {
+  const left = document.getElementById('pong-left-score');
+  const right = document.getElementById('pong-right-score');
+  if (left) left.textContent = String(pongState?.left.score || 0);
+  if (right) right.textContent = String(pongState?.right.score || 0);
+  const target = document.getElementById('pong-target-display');
+  if (target) target.textContent = String(pongScoreToWin || getPongTargetFromInput());
+}
+
+function drawPongCourt(message) {
+  if (!initPongCanvas()) return;
+  const ctx = pongCtx, w = pongCanvas.width, h = pongCanvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = 'rgba(240,200,160,0.25)';
+  ctx.setLineDash([10, 12]);
+  ctx.beginPath();
+  ctx.moveTo(w/2, 12); ctx.lineTo(w/2, h-12); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(253,240,244,0.9)';
+  ctx.font = '13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(message || 'Pong Battle', w/2, 28);
+}
+
+function drawPongIdle() {
+  if (!initPongCanvas()) return;
+  if (!pongState) pongState = createPongState();
+  updatePongNames();
+  updatePongScoreUI();
+  drawPongCourt('Choose mode and score to win, then start.');
+  const ctx = pongCtx, w = pongCanvas.width, h = pongCanvas.height;
+  ctx.fillStyle = 'rgba(240,200,160,0.85)';
+  ctx.fillRect(26, h/2 - 48, 12, 96);
+  ctx.fillRect(w - 38, h/2 - 48, 12, 96);
+  ctx.beginPath();
+  ctx.arc(w/2, h/2, 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.font = '26px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏓 Pong Battle', w/2, h/2 - 24);
+  ctx.font = '14px sans-serif';
+  ctx.fillText('First to ' + getPongTargetFromInput() + ' wins', w/2, h/2 + 12);
+}
+
+function movePongPaddles() {
+  const s = pongState;
+  if (pongKeys.w) s.left.y -= s.paddleSpeed;
+  if (pongKeys.s) s.left.y += s.paddleSpeed;
+  if (pongMode === 'local') {
+    if (pongKeys.up) s.right.y -= s.paddleSpeed;
+    if (pongKeys.down) s.right.y += s.paddleSpeed;
+  } else {
+    const target = s.ball.y - s.right.height / 2;
+    const aiSpeed = Math.min(6.2, Math.max(3.2, Math.abs(s.ball.vx) * 0.85));
+    if (s.right.y < target - 8) s.right.y += aiSpeed;
+    if (s.right.y > target + 8) s.right.y -= aiSpeed;
+  }
+  clampPaddle(s.left); clampPaddle(s.right);
+}
+
+function updatePongBall() {
+  const s = pongState, b = s.ball;
+  b.x += b.vx; b.y += b.vy;
+  if (b.y - b.r <= 0 || b.y + b.r >= s.h) {
+    b.vy *= -1;
+    b.y = Math.max(b.r, Math.min(s.h - b.r, b.y));
+  }
+  [s.left, s.right].forEach((p, idx) => {
+    const hit = b.x + b.r > p.x && b.x - b.r < p.x + p.width && b.y + b.r > p.y && b.y - b.r < p.y + p.height;
+    if (!hit) return;
+    const rel = (b.y - (p.y + p.height / 2)) / (p.height / 2);
+    const dir = idx === 0 ? 1 : -1;
+    b.vx = Math.min(s.maxBallSpeed, Math.abs(b.vx) + 0.35) * dir;
+    b.vy = rel * 6.5;
+    b.x = idx === 0 ? p.x + p.width + b.r : p.x - b.r;
+  });
+  if (b.x < -20) {
+    s.right.score++;
+    updatePongScoreUI();
+    if (checkPongWinner()) return;
+    resetPongBall(-1);
+  }
+  if (b.x > s.w + 20) {
+    s.left.score++;
+    updatePongScoreUI();
+    if (checkPongWinner()) return;
+    resetPongBall(1);
+  }
+}
+
+function drawPongFrame() {
+  const s = pongState, ctx = pongCtx;
+  drawPongCourt('First to ' + pongScoreToWin + ' wins');
+  ctx.fillStyle = 'rgba(240,200,160,0.95)';
+  ctx.fillRect(s.left.x, s.left.y, s.left.width, s.left.height);
+  ctx.fillRect(s.right.x, s.right.y, s.right.width, s.right.height);
+  ctx.beginPath();
+  ctx.arc(s.ball.x, s.ball.y, s.ball.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(253,240,244,0.88)';
+  ctx.font = '36px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(s.left.score, s.w/2 - 62, 62);
+  ctx.fillText(s.right.score, s.w/2 + 62, 62);
+}
+
+function pongLoop() {
+  if (!pongRunning || !pongState) return;
+  movePongPaddles();
+  updatePongBall();
+  drawPongFrame();
+  if (pongRunning) pongLoopId = requestAnimationFrame(pongLoop);
+}
+
+function checkPongWinner() {
+  const s = pongState;
+  if (s.left.score < pongScoreToWin && s.right.score < pongScoreToWin) return false;
+  pongRunning = false;
+  stopPongLoop();
+  const input = document.getElementById('pong-score-to-win');
+  if (input) input.disabled = false;
+  const leftWon = s.left.score > s.right.score;
+  const winnerName = leftWon ? (currentUserName || 'Player 1') : (pongMode === 'ai' ? 'AI' : (ALLOWED_USERS[getPartnerEmail()] || 'Player 2'));
+  document.getElementById('pong-status').textContent = `${winnerName} wins ${s.left.score}-${s.right.score}. Change score to win or start another match.`;
+  drawPongFrame();
+  const ctx = pongCtx;
+  ctx.fillStyle = 'rgba(0,0,0,0.52)';
+  ctx.fillRect(0,0,pongCanvas.width,pongCanvas.height);
+  ctx.fillStyle = '#fdf0f4';
+  ctx.textAlign = 'center';
+  ctx.font = '28px serif';
+  ctx.fillText(winnerName + ' wins! 🏆', pongCanvas.width/2, pongCanvas.height/2 - 5);
+  ctx.font = '16px sans-serif';
+  ctx.fillText(`${s.left.score} - ${s.right.score}`, pongCanvas.width/2, pongCanvas.height/2 + 28);
+  if (leftWon && !pongWinnerSaved) savePongWin(s.left.score, s.right.score);
+  if (!leftWon && pongMode === 'local' && !pongWinnerSaved) savePongPartnerWin(s.right.score, s.left.score);
+  return true;
+}
+
+function savePongWin(scoreFor, scoreAgainst) {
+  if (!currentUser) return;
+  pongWinnerSaved = true;
+  const scoreRef = db.collection('gameScores').doc(currentUser.email);
+  db.runTransaction(tx => tx.get(scoreRef).then(doc => {
+    const d = doc.exists ? doc.data() : {};
+    tx.set(scoreRef, {
+      name: currentUserName,
+      email: currentUser.email,
+      pongWins: (d.pongWins || 0) + 1,
+      pongGamesPlayed: (d.pongGamesPlayed || 0) + 1,
+      pongBestMargin: Math.max(d.pongBestMargin || 0, scoreFor - scoreAgainst),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  })).then(() => notifyPartnerActivity(currentUserName + ' won Pong Battle ' + scoreFor + '-' + scoreAgainst + ' 🏓'));
+}
+
+function savePongPartnerWin(scoreFor, scoreAgainst) {
+  const partnerEmail = getPartnerEmail();
+  if (!partnerEmail) return;
+  pongWinnerSaved = true;
+  const partnerName = ALLOWED_USERS[partnerEmail] || 'Partner';
+  const scoreRef = db.collection('gameScores').doc(partnerEmail);
+  db.runTransaction(tx => tx.get(scoreRef).then(doc => {
+    const d = doc.exists ? doc.data() : {};
+    tx.set(scoreRef, {
+      name: partnerName,
+      email: partnerEmail,
+      pongWins: (d.pongWins || 0) + 1,
+      pongGamesPlayed: (d.pongGamesPlayed || 0) + 1,
+      pongBestMargin: Math.max(d.pongBestMargin || 0, scoreFor - scoreAgainst),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  })).then(() => notifyPartnerActivity(partnerName + ' won Pong Battle ' + scoreFor + '-' + scoreAgainst + ' 🏓'));
+}
+
+document.addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  if (['w','s','arrowup','arrowdown',' '].includes(key)) e.preventDefault();
+  if (key === 'w') pongKeys.w = true;
+  if (key === 's') pongKeys.s = true;
+  if (key === 'arrowup') pongKeys.up = true;
+  if (key === 'arrowdown') pongKeys.down = true;
+});
+document.addEventListener('keyup', e => {
+  const key = e.key.toLowerCase();
+  if (key === 'w') pongKeys.w = false;
+  if (key === 's') pongKeys.s = false;
+  if (key === 'arrowup') pongKeys.up = false;
+  if (key === 'arrowdown') pongKeys.down = false;
+});
 
 function initFlappyCanvas() {
   flappyCanvas = document.getElementById('flappy-canvas');
@@ -1882,22 +2210,22 @@ function watchGameScores() {
 
 function getGameWinners() {
   const players = Object.values(gameScores || {});
-  const wordPlayers = players.filter(p => p.wordScrambleAttempts > 0 && p.wordScrambleAvgMs).sort((a,b) => a.wordScrambleAvgMs - b.wordScrambleAvgMs);
+  const pongPlayers = players.filter(p => p.pongWins > 0).sort((a,b) => (b.pongWins || 0) - (a.pongWins || 0) || (b.pongBestMargin || 0) - (a.pongBestMargin || 0));
   const flappyPlayers = players.filter(p => p.flappyGamesPlayed > 0).sort((a,b) => (b.flappyBestScore || 0) - (a.flappyBestScore || 0));
-  return { word: wordPlayers[0] || null, flappy: flappyPlayers[0] || null };
+  return { pong: pongPlayers[0] || null, flappy: flappyPlayers[0] || null };
 }
 
 function getPlayerTotals(email) {
   const p = gameScores[email] || {};
   const winners = getGameWinners();
   let totalWins = 0;
-  if (winners.word && winners.word.email === email) totalWins++;
+  if (winners.pong && winners.pong.email === email) totalWins++;
   if (winners.flappy && winners.flappy.email === email) totalWins++;
   return {
     totalWins,
-    gamesPlayed: (p.wordScrambleAttempts || 0) + (p.flappyGamesPlayed || 0),
-    wordAvg: p.wordScrambleAvgMs || null,
-    wordBest: p.wordScrambleBestMs || null,
+    gamesPlayed: (p.pongGamesPlayed || 0) + (p.flappyGamesPlayed || 0),
+    pongWins: p.pongWins || 0,
+    pongBestMargin: p.pongBestMargin || 0,
     flappyBest: p.flappyBestScore || 0,
     name: p.name || (ALLOWED_USERS[email] || 'Player'),
     email
@@ -1905,33 +2233,29 @@ function getPlayerTotals(email) {
 }
 
 function renderGameScores() {
-  renderWordLeaderboard();
+  renderPongLeaderboard();
   renderFlappyLeaderboard();
   renderCombinedLeaderboard();
 }
 
-function renderWordLeaderboard() {
-  const list = document.getElementById('game-score-list');
-  const summary = document.getElementById('leaderboard-summary');
-  const myAvg = document.getElementById('my-average-display');
-  const partnerAvg = document.getElementById('partner-average-display');
-  const players = Object.values(gameScores).filter(p => p.wordScrambleAttempts > 0 && p.wordScrambleAvgMs).sort((a,b) => a.wordScrambleAvgMs - b.wordScrambleAvgMs);
+function renderPongLeaderboard() {
+  const list = document.getElementById('pong-score-list');
+  const myWins = document.getElementById('my-pong-wins');
+  const partnerWins = document.getElementById('partner-pong-wins');
   const me = currentUser ? gameScores[currentUser.email] : null;
   const partner = currentUser ? gameScores[getPartnerEmail()] : null;
-  if (myAvg) myAvg.textContent = me && me.wordScrambleAvgMs ? (me.wordScrambleAvgMs / 1000).toFixed(2) + 's' : '--';
-  if (partnerAvg) partnerAvg.textContent = partner && partner.wordScrambleAvgMs ? (partner.wordScrambleAvgMs / 1000).toFixed(2) + 's' : '--';
+  if (myWins) myWins.textContent = me && me.pongGamesPlayed ? String(me.pongWins || 0) : '--';
+  if (partnerWins) partnerWins.textContent = partner && partner.pongGamesPlayed ? String(partner.pongWins || 0) : '--';
   if (!list) return;
+  const players = Object.values(gameScores).filter(p => p.pongGamesPlayed > 0 || p.pongWins > 0).sort((a,b) => (b.pongWins || 0) - (a.pongWins || 0) || (b.pongBestMargin || 0) - (a.pongBestMargin || 0));
   if (!players.length) {
-    list.innerHTML = '<div class="score-row">No Word Scramble scores yet <span>---</span></div>';
-    if (summary) summary.textContent = 'Play a round to start the battle.';
+    list.innerHTML = '<div class="score-row">No Pong wins yet <span>---</span></div>';
     return;
   }
-  const winner = players[0];
-  if (summary) summary.textContent = `${winner.name} leads Word Scramble with ${(winner.wordScrambleAvgMs / 1000).toFixed(2)}s average.`;
   list.innerHTML = players.map((p, idx) => `
     <div class="score-row ${idx === 0 ? 'winner' : ''}">
       <span>${idx === 0 ? '👑 ' : ''}<strong>${escHtml(p.name || 'Player')}</strong></span>
-      <span>Avg ${(p.wordScrambleAvgMs / 1000).toFixed(2)}s · Best ${(p.wordScrambleBestMs / 1000).toFixed(2)}s · Played ${p.wordScrambleAttempts}</span>
+      <span>Wins ${p.pongWins || 0} · Played ${p.pongGamesPlayed || 0} · Best margin ${p.pongBestMargin || 0}</span>
     </div>
   `).join('');
 }
@@ -1965,12 +2289,12 @@ function renderCombinedLeaderboard() {
   const navCrown = document.getElementById('nav-game-crown');
   const crownTitle = document.getElementById('overall-winner-crown');
   const emails = Array.from(new Set([...Object.keys(ALLOWED_USERS), ...Object.keys(gameScores)]));
-  const totals = emails.map(getPlayerTotals).filter(p => p.gamesPlayed > 0).sort((a,b) => (b.totalWins - a.totalWins) || (b.gamesPlayed - a.gamesPlayed) || (b.flappyBest - a.flappyBest));
+  const totals = emails.map(getPlayerTotals).filter(p => p.gamesPlayed > 0).sort((a,b) => (b.totalWins - a.totalWins) || (b.pongWins - a.pongWins) || (b.gamesPlayed - a.gamesPlayed) || (b.flappyBest - a.flappyBest));
   const winners = getGameWinners();
 
   if (perGame) {
     perGame.innerHTML = `
-      <div class="score-row ${winners.word ? 'winner' : ''}"><span>🔤 Word Scramble</span><span>${winners.word ? '👑 ' + escHtml(winners.word.name || 'Player') + ' · Avg ' + (winners.word.wordScrambleAvgMs/1000).toFixed(2) + 's' : 'No winner yet'}</span></div>
+      <div class="score-row ${winners.pong ? 'winner' : ''}"><span>🏓 Pong Battle</span><span>${winners.pong ? '👑 ' + escHtml(winners.pong.name || 'Player') + ' · Wins ' + (winners.pong.pongWins || 0) : 'No winner yet'}</span></div>
       <div class="score-row ${winners.flappy ? 'winner' : ''}"><span>🐦 Flappy Love</span><span>${winners.flappy ? '👑 ' + escHtml(winners.flappy.name || 'Player') + ' · Best ' + (winners.flappy.flappyBestScore || 0) : 'No winner yet'}</span></div>
     `;
   }
@@ -1991,7 +2315,7 @@ function renderCombinedLeaderboard() {
   combined.innerHTML = totals.map((p, idx) => `
     <div class="score-row ${idx === 0 ? 'winner' : ''}">
       <span>${idx === 0 ? '👑 ' : ''}<strong>${escHtml(p.name)}</strong><br><span style="font-size:0.74rem;color:var(--text-dimmer);">Games played: ${p.gamesPlayed}</span></span>
-      <span>Total wins: ${p.totalWins}<br><span style="font-size:0.74rem;color:var(--text-dimmer);">Word: ${p.wordAvg ? (p.wordAvg/1000).toFixed(2)+'s avg' : '--'} · Flappy: ${p.flappyBest || '--'}</span></span>
+      <span>Total wins: ${p.totalWins}<br><span style="font-size:0.74rem;color:var(--text-dimmer);">Pong wins: ${p.pongWins || 0} · Flappy: ${p.flappyBest || '--'}</span></span>
     </div>
   `).join('');
 }
