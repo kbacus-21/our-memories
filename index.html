@@ -292,6 +292,42 @@
     .new-msg-toast{position:fixed;bottom:2rem;right:1.5rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;padding:0.7rem 1.2rem;border-radius:50px;font-size:0.85rem;box-shadow:0 8px 24px rgba(232,99,122,0.45);z-index:5000;animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;display:flex;align-items:center;gap:0.5rem;}
     @keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(0.9);}to{opacity:1;transform:translateY(0) scale(1);}}
 
+
+    /* ── GAMES ── */
+    .games-layout{display:grid;grid-template-columns:1.25fr 0.75fr;gap:1rem;align-items:start;}
+    .game-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.4rem;margin-bottom:1rem;box-shadow:0 14px 36px rgba(0,0,0,0.22);}
+    .game-card h3{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400;color:var(--gold);margin-bottom:0.5rem;}
+    .game-card p{color:var(--text-dim);font-size:0.9rem;line-height:1.6;}
+    .game-row{display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;margin-top:0.8rem;}
+    .game-row input{flex:1;min-width:190px;padding:0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.95rem;outline:none;font-family:'DM Sans',sans-serif;}
+    .game-row input:focus{border-color:var(--rose);}
+    .word-bank-list{display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.9rem;}
+    .word-chip{display:inline-flex;align-items:center;gap:0.4rem;background:rgba(240,200,160,0.08);border:1px solid var(--gold-dim);border-radius:999px;padding:0.35rem 0.65rem;color:var(--gold);font-size:0.82rem;}
+    .word-chip button{background:none;border:none;color:var(--rose);cursor:pointer;font-size:0.85rem;line-height:1;}
+    .scramble-display{font-family:'Cormorant Garamond',serif;font-size:2.5rem;letter-spacing:0.18em;text-align:center;color:var(--gold);padding:1.1rem;border:1px dashed var(--gold-dim);border-radius:14px;background:rgba(240,200,160,0.05);margin:1rem 0;word-break:break-all;}
+    .game-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.7rem;margin-top:1rem;}
+    .game-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:0.8rem;text-align:center;}
+    .game-stat strong{display:block;color:var(--gold);font-size:1.1rem;}
+    .game-stat span{font-size:0.75rem;color:var(--text-dim);}
+    .score-list{display:flex;flex-direction:column;gap:0.55rem;margin-top:0.8rem;}
+    .score-row{display:flex;justify-content:space-between;gap:1rem;padding:0.7rem 0.85rem;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:0.9rem;}
+    .score-row.winner{border-color:var(--gold-dim);color:var(--gold);background:rgba(240,200,160,0.07);}
+    .game-presence-pill{display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--border);background:var(--surface);border-radius:50px;padding:0.35rem 0.75rem;color:var(--text-dim);font-size:0.82rem;}
+    .mini-game-chat{position:fixed;right:1rem;bottom:1rem;width:280px;max-width:calc(100vw - 2rem);background:rgba(15,8,20,0.96);border:1px solid var(--border-hover);border-radius:18px;padding:0.8rem;z-index:550;box-shadow:0 14px 46px rgba(0,0,0,0.55);backdrop-filter:blur(18px);display:none;}
+    .mini-game-chat.show{display:block;animation:fadeUp 0.2s ease;}
+    .mini-chat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.1rem;}
+    .mini-chat-head button{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem;}
+    .mini-chat-status{font-size:0.75rem;color:var(--text-dimmer);margin-bottom:0.5rem;}
+    .mini-chat-list{max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:0.35rem;margin-bottom:0.6rem;}
+    .mini-chat-msg{font-size:0.78rem;color:var(--text-dim);background:rgba(255,255,255,0.04);border-radius:10px;padding:0.45rem 0.6rem;line-height:1.4;}
+    .mini-chat-msg.mine{align-self:flex-end;background:rgba(232,99,122,0.18);color:var(--text);}
+    .mini-chat-input-row{display:flex;gap:0.4rem;}
+    .mini-chat-input-row input{flex:1;padding:0.55rem 0.75rem;border-radius:50px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);outline:none;font-family:'DM Sans',sans-serif;font-size:0.82rem;}
+    .mini-chat-input-row button{padding:0.5rem 0.7rem;border-radius:50px;border:none;background:var(--rose);color:#fff;cursor:pointer;font-size:0.78rem;}
+    .game-toast{position:fixed;right:1.5rem;bottom:6.2rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;padding:0.75rem 1.1rem;border-radius:50px;box-shadow:0 8px 24px rgba(232,99,122,0.45);z-index:5100;font-size:0.85rem;animation:toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;}
+    @media(max-width:800px){.games-layout{grid-template-columns:1fr;}.mini-game-chat{left:1rem;right:1rem;width:auto;}.scramble-display{font-size:2rem;}}
+
+
     ::-webkit-scrollbar{width:3px;}
     ::-webkit-scrollbar-thumb{background:rgba(232,99,122,0.4);border-radius:2px;}
   </style>
@@ -398,6 +434,7 @@
       <button onclick="showSection('notes')" id="nav-notes">📝 Notes</button>
       <button onclick="showSection('timeline')" id="nav-timeline">🗓️ Timeline</button>
       <button onclick="showSection('messages')" id="nav-messages">💌 Messages</button>
+      <button onclick="showSection('games')" id="nav-games">🎮 Games <span id="nav-game-crown"></span></button>
       <button id="logout-btn">Logout</button>
     </div>
   </nav>
@@ -499,6 +536,78 @@
       </div>
     </section>
 
+
+    <!-- GAMES -->
+    <section id="games" class="section">
+      <div class="section-header">
+        <h2>Games 🎮 <span id="overall-winner-crown"></span></h2>
+        <div class="game-presence-pill" id="game-presence-pill">🎮 Checking partner...</div>
+      </div>
+
+      <div class="games-layout">
+        <div>
+          <div class="game-card">
+            <h3>Word Scramble 🔤</h3>
+            <p>Add your own words to the shared word bank, then race to unscramble them. The fastest average time steals the crown. No pressure... actually, full pressure. 😂</p>
+            <div class="scramble-display" id="scramble-display">READY</div>
+            <div class="game-row">
+              <input type="text" id="scramble-answer" placeholder="Type the correct word here" autocomplete="off"/>
+              <button class="btn-rose" onclick="startWordScramble()">Start Round</button>
+              <button class="btn-gold" onclick="submitWordScramble()">Submit</button>
+            </div>
+            <p id="scramble-feedback" style="margin-top:0.8rem;color:var(--gold);"></p>
+            <div class="game-stat-grid">
+              <div class="game-stat"><strong id="timer-display">0.00s</strong><span>Your time</span></div>
+              <div class="game-stat"><strong id="my-average-display">--</strong><span>Your avg</span></div>
+              <div class="game-stat"><strong id="partner-average-display">--</strong><span>Partner avg</span></div>
+            </div>
+          </div>
+
+          <div class="game-card">
+            <h3>Shared Word Bank 💬</h3>
+            <p>Use places, nicknames, pet names, funny words, and inside jokes. Keep it wholesome-ish. 😌</p>
+            <div class="game-row">
+              <input type="text" id="word-bank-input" placeholder="Example: Butong, baby, mango, date night" autocomplete="off"/>
+              <button class="btn-rose" onclick="addWordBankWord()">Add Word</button>
+            </div>
+            <div id="word-bank-list" class="word-bank-list"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="game-card">
+            <h3>Leaderboard 👑</h3>
+            <p id="leaderboard-summary">Play a round to start the battle.</p>
+            <div id="game-score-list" class="score-list"></div>
+          </div>
+
+          <div class="game-card">
+            <h3>Game Actions 😂</h3>
+            <p>Distract each other a little. Love is war, but cute.</p>
+            <div class="game-row">
+              <button class="btn-rose" onclick="pokePartner()">Poke Partner 💕</button>
+              <button class="btn-gold" onclick="toggleMiniGameChat(true)">Open Mini Chat 💬</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLOATING GAME CHAT -->
+    <div class="mini-game-chat" id="mini-game-chat">
+      <div class="mini-chat-head">
+        <span>Game Chat 💬</span>
+        <button onclick="toggleMiniGameChat(false)">✕</button>
+      </div>
+      <div class="mini-chat-status" id="mini-chat-status">Partner status...</div>
+      <div class="mini-chat-list" id="mini-chat-list"></div>
+      <div class="mini-chat-input-row">
+        <input type="text" id="mini-chat-input" placeholder="Trash talk sweetly..." autocomplete="off"/>
+        <button onclick="sendGameChatMessage()">Send</button>
+      </div>
+    </div>
+
+
   </main>
 </div>
 
@@ -544,6 +653,19 @@ const avatarCache = {};
 // For photo sending in chat
 let pendingPhotoBase64 = null;
 
+// ── GAMES STATE ──
+let wordBankUnsubscribe = null;
+let gameScoresUnsubscribe = null;
+let gameChatUnsubscribe = null;
+let gamePresenceUnsubscribe = null;
+let gameActivityUnsubscribe = null;
+let gameWordBank = [];
+let gameScores = {};
+let currentScrambleOriginal = '';
+let currentScrambleStartedAt = null;
+let currentScrambleTimer = null;
+let lastGameActivityTs = Date.now();
+
 // ── AUTH ──
 auth.onAuthStateChanged((user) => {
   if (user) {
@@ -566,6 +688,7 @@ auth.onAuthStateChanged((user) => {
     currentUser = null;
     if (onlineUnsubscribe) onlineUnsubscribe();
     if (unreadUnsubscribe) unreadUnsubscribe();
+    cleanupGames();
     if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
     document.removeEventListener('visibilitychange', handleVisibilityChange);
     document.getElementById('login-page').style.display = 'flex';
@@ -625,10 +748,16 @@ function showSection(name) {
       if (list) list.scrollTop = list.scrollHeight;
     }, 50);
   }
+  if (name === 'games') {
+    setGamePresence(true);
+    toggleMiniGameChat(true);
+  } else {
+    setGamePresence(false);
+  }
 }
 
 function loadAll() {
-  loadAlbums(); loadNotes(); loadTimeline(); loadMessages(); fetchAllPhotos();
+  loadAlbums(); loadNotes(); loadTimeline(); loadMessages(); fetchAllPhotos(); loadGames();
 }
 
 // ── ONLINE STATUS ──
@@ -1203,18 +1332,18 @@ function sendPhotoMessage() {
     senderName: currentUserName,
     seen: false,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => { cancelPhotoSend(); });
+  }).then(() => { cancelPhotoSend(); notifyPartnerActivity(currentUserName + ' sent you a photo 📷'); });
 }
 
 function sendMessage(voiceUrl) {
   if (voiceUrl) {
     if (!currentUser) return;
-    db.collection('messages').add({type:'voice',audioUrl:voiceUrl,sender:currentUser.email,senderName:currentUserName,seen:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    db.collection('messages').add({type:'voice',audioUrl:voiceUrl,sender:currentUser.email,senderName:currentUserName,seen:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(() => notifyPartnerActivity(currentUserName + ' sent you a voice message 🎙️'));
     return;
   }
   const text = document.getElementById('message-text').value.trim();
   if (!text || !currentUser) return;
-  db.collection('messages').add({type:'text',text,sender:currentUser.email,senderName:currentUserName,seen:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  db.collection('messages').add({type:'text',text,sender:currentUser.email,senderName:currentUserName,seen:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(() => notifyPartnerActivity(currentUserName + ' messaged you 💌'));
   document.getElementById('message-text').value = '';
 }
 
@@ -1344,6 +1473,312 @@ function escHtml(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,
 function escAttr(str){return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,'').replace(/\r/g,'');}
 
 document.addEventListener('keydown', e => { if(e.key==='Escape'){closeLightbox();closeSlideshow();closeCelebration();} });
+
+// ── GAMES: WORD SCRAMBLE + MINI CHAT ──
+function getPartnerEmail() {
+  if (!currentUser) return null;
+  return Object.keys(ALLOWED_USERS).find(e => e !== currentUser.email.toLowerCase());
+}
+
+function loadGames() {
+  loadWordBank();
+  watchGameScores();
+  watchGameChat();
+  watchGamePresence();
+  watchGameActivities();
+}
+
+function cleanupGames() {
+  [wordBankUnsubscribe, gameScoresUnsubscribe, gameChatUnsubscribe, gamePresenceUnsubscribe, gameActivityUnsubscribe].forEach(unsub => {
+    if (typeof unsub === 'function') unsub();
+  });
+  wordBankUnsubscribe = gameScoresUnsubscribe = gameChatUnsubscribe = gamePresenceUnsubscribe = gameActivityUnsubscribe = null;
+  if (currentScrambleTimer) clearInterval(currentScrambleTimer);
+}
+
+function loadWordBank() {
+  if (wordBankUnsubscribe) wordBankUnsubscribe();
+  wordBankUnsubscribe = db.collection('gameWordBank').orderBy('createdAt','desc').onSnapshot(snap => {
+    gameWordBank = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(w => w.word);
+    renderWordBank();
+  });
+}
+
+function renderWordBank() {
+  const list = document.getElementById('word-bank-list');
+  if (!list) return;
+  if (!gameWordBank.length) {
+    list.innerHTML = '<span style="color:var(--text-dimmer);font-size:0.85rem;">No words yet. Add your first inside joke.</span>';
+    return;
+  }
+  list.innerHTML = gameWordBank.map(w => `
+    <span class="word-chip" title="Added by ${escAttr(w.addedByName || 'Someone')}">
+      ${escHtml(w.word)}
+      ${currentUser && w.addedBy === currentUser.email ? `<button onclick="deleteWordBankWord('${w.id}')">✕</button>` : ''}
+    </span>
+  `).join('');
+}
+
+function addWordBankWord() {
+  const input = document.getElementById('word-bank-input');
+  const raw = input.value.trim();
+  if (!raw || !currentUser) return;
+  const words = raw.split(',').map(w => w.trim()).filter(Boolean).slice(0, 12);
+  const batch = db.batch();
+  words.forEach(word => {
+    const ref = db.collection('gameWordBank').doc();
+    batch.set(ref, {
+      word,
+      searchable: word.toLowerCase(),
+      addedBy: currentUser.email,
+      addedByName: currentUserName,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  });
+  batch.commit().then(() => {
+    input.value = '';
+    notifyPartnerActivity(currentUserName + ' added new Word Scramble words 🔤');
+  });
+}
+
+function deleteWordBankWord(id) {
+  if (!id) return;
+  db.collection('gameWordBank').doc(id).delete();
+}
+
+function shuffleWord(word) {
+  const letters = word.split('');
+  if (letters.length <= 2) return letters.reverse().join('');
+  let shuffled = word;
+  for (let tries = 0; tries < 12 && shuffled.toLowerCase() === word.toLowerCase(); tries++) {
+    shuffled = letters.slice().sort(() => Math.random() - 0.5).join('');
+  }
+  return shuffled;
+}
+
+function startWordScramble() {
+  if (!currentUser) return;
+  if (!gameWordBank.length) {
+    document.getElementById('scramble-feedback').textContent = 'Add words first. The game needs ammo. 😅';
+    return;
+  }
+  const pick = gameWordBank[Math.floor(Math.random() * gameWordBank.length)].word;
+  currentScrambleOriginal = pick;
+  currentScrambleStartedAt = Date.now();
+  document.getElementById('scramble-display').textContent = shuffleWord(pick).toUpperCase();
+  document.getElementById('scramble-answer').value = '';
+  document.getElementById('scramble-answer').focus();
+  document.getElementById('scramble-feedback').textContent = 'Timer started. Go go go! 🏃';
+  setGamePresence(true);
+  notifyPartnerActivity(currentUserName + ' just started playing Word Scramble! 🎮');
+  if (currentScrambleTimer) clearInterval(currentScrambleTimer);
+  currentScrambleTimer = setInterval(() => {
+    if (!currentScrambleStartedAt) return;
+    document.getElementById('timer-display').textContent = ((Date.now() - currentScrambleStartedAt) / 1000).toFixed(2) + 's';
+  }, 80);
+}
+
+function submitWordScramble() {
+  if (!currentUser || !currentScrambleOriginal || !currentScrambleStartedAt) return;
+  const answer = document.getElementById('scramble-answer').value.trim();
+  if (answer.toLowerCase() !== currentScrambleOriginal.toLowerCase()) {
+    document.getElementById('scramble-feedback').textContent = 'Nope, try again. The letters are laughing. 😭';
+    return;
+  }
+  const timeMs = Date.now() - currentScrambleStartedAt;
+  if (currentScrambleTimer) clearInterval(currentScrambleTimer);
+  currentScrambleTimer = null;
+  currentScrambleStartedAt = null;
+  document.getElementById('timer-display').textContent = (timeMs / 1000).toFixed(2) + 's';
+  document.getElementById('scramble-feedback').textContent = `Correct! ${currentScrambleOriginal} in ${(timeMs / 1000).toFixed(2)} seconds 🔥`;
+
+  const scoreRef = db.collection('gameScores').doc(currentUser.email);
+  db.runTransaction(tx => tx.get(scoreRef).then(doc => {
+    const d = doc.exists ? doc.data() : {};
+    const attempts = (d.wordScrambleAttempts || 0) + 1;
+    const totalMs = (d.wordScrambleTotalMs || 0) + timeMs;
+    const bestMs = d.wordScrambleBestMs ? Math.min(d.wordScrambleBestMs, timeMs) : timeMs;
+    tx.set(scoreRef, {
+      name: currentUserName,
+      email: currentUser.email,
+      wordScrambleAttempts: attempts,
+      wordScrambleTotalMs: totalMs,
+      wordScrambleBestMs: bestMs,
+      wordScrambleAvgMs: Math.round(totalMs / attempts),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  })).then(() => {
+    notifyPartnerActivity(currentUserName + ' finished Word Scramble in ' + (timeMs / 1000).toFixed(2) + 's 🔥');
+  });
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const active = document.activeElement;
+    if (active && active.id === 'scramble-answer') submitWordScramble();
+    if (active && active.id === 'word-bank-input') addWordBankWord();
+    if (active && active.id === 'mini-chat-input') sendGameChatMessage();
+  }
+});
+
+function watchGameScores() {
+  if (gameScoresUnsubscribe) gameScoresUnsubscribe();
+  gameScoresUnsubscribe = db.collection('gameScores').onSnapshot(snap => {
+    gameScores = {};
+    snap.forEach(doc => gameScores[doc.id] = doc.data());
+    renderGameScores();
+  });
+}
+
+function renderGameScores() {
+  const list = document.getElementById('game-score-list');
+  const summary = document.getElementById('leaderboard-summary');
+  const navCrown = document.getElementById('nav-game-crown');
+  const crownTitle = document.getElementById('overall-winner-crown');
+  const myAvg = document.getElementById('my-average-display');
+  const partnerAvg = document.getElementById('partner-average-display');
+  if (!list) return;
+
+  const players = Object.values(gameScores).filter(p => p.wordScrambleAttempts > 0).sort((a,b) => (a.wordScrambleAvgMs || 999999999) - (b.wordScrambleAvgMs || 999999999));
+  const me = currentUser ? gameScores[currentUser.email] : null;
+  const partner = currentUser ? gameScores[getPartnerEmail()] : null;
+  if (myAvg) myAvg.textContent = me && me.wordScrambleAvgMs ? (me.wordScrambleAvgMs / 1000).toFixed(2) + 's' : '--';
+  if (partnerAvg) partnerAvg.textContent = partner && partner.wordScrambleAvgMs ? (partner.wordScrambleAvgMs / 1000).toFixed(2) + 's' : '--';
+
+  if (!players.length) {
+    list.innerHTML = '<div class="score-row">No scores yet <span>---</span></div>';
+    if (summary) summary.textContent = 'Play a round to start the battle.';
+    if (navCrown) navCrown.textContent = '';
+    if (crownTitle) crownTitle.textContent = '';
+    return;
+  }
+
+  const winner = players[0];
+  if (summary) summary.textContent = `${winner.name} is currently winning with an average of ${(winner.wordScrambleAvgMs / 1000).toFixed(2)}s.`;
+  if (navCrown) navCrown.textContent = winner.email === (currentUser && currentUser.email) ? '👑' : '';
+  if (crownTitle) crownTitle.textContent = `👑 ${winner.name}`;
+
+  list.innerHTML = players.map((p, idx) => `
+    <div class="score-row ${idx === 0 ? 'winner' : ''}">
+      <span>${idx === 0 ? '👑 ' : ''}${escHtml(p.name || 'Player')}</span>
+      <span>Avg ${(p.wordScrambleAvgMs / 1000).toFixed(2)}s · Best ${(p.wordScrambleBestMs / 1000).toFixed(2)}s · ${p.wordScrambleAttempts}x</span>
+    </div>
+  `).join('');
+}
+
+function toggleMiniGameChat(show) {
+  const chat = document.getElementById('mini-game-chat');
+  if (!chat) return;
+  chat.classList.toggle('show', !!show);
+}
+
+function watchGameChat() {
+  if (gameChatUnsubscribe) gameChatUnsubscribe();
+  gameChatUnsubscribe = db.collection('gameChat').orderBy('createdAt','asc').limit(50).onSnapshot(snap => {
+    const list = document.getElementById('mini-chat-list');
+    if (!list || !currentUser) return;
+    list.innerHTML = snap.docs.map(doc => {
+      const d = doc.data();
+      const mine = d.sender === currentUser.email;
+      return `<div class="mini-chat-msg ${mine ? 'mine' : ''}"><strong>${escHtml(d.senderName || 'Player')}:</strong> ${escHtml(d.text || '')}</div>`;
+    }).join('');
+    list.scrollTop = list.scrollHeight;
+  });
+}
+
+function sendGameChatMessage() {
+  const input = document.getElementById('mini-chat-input');
+  const text = input.value.trim();
+  if (!text || !currentUser) return;
+  db.collection('gameChat').add({
+    text,
+    sender: currentUser.email,
+    senderName: currentUserName,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    input.value = '';
+    notifyPartnerActivity(currentUserName + ' sent a game chat 💬');
+  });
+}
+
+function setGamePresence(isPlaying) {
+  if (!currentUser) return;
+  db.collection('gamePresence').doc(currentUser.email).set({
+    name: currentUserName,
+    email: currentUser.email,
+    isPlaying: !!isPlaying,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true }).catch(() => {});
+}
+
+function watchGamePresence() {
+  if (gamePresenceUnsubscribe) gamePresenceUnsubscribe();
+  const partner = getPartnerEmail();
+  if (!partner) return;
+  gamePresenceUnsubscribe = db.collection('gamePresence').doc(partner).onSnapshot(doc => {
+    const pill = document.getElementById('game-presence-pill');
+    const mini = document.getElementById('mini-chat-status');
+    let status = 'Partner is not playing right now.';
+    if (doc.exists) {
+      const d = doc.data();
+      const updated = d.updatedAt ? d.updatedAt.toDate() : null;
+      const fresh = updated && (Date.now() - updated.getTime()) < 2 * 60 * 1000;
+      if (d.isPlaying && fresh) status = `${d.name || 'Partner'} is currently playing 🎮`;
+    }
+    if (pill) pill.textContent = status;
+    if (mini) mini.textContent = status;
+  });
+}
+
+function pokePartner() {
+  if (!currentUser) return;
+  notifyPartnerActivity(currentUserName + ' is poking you! 💕');
+  showGameToast('Poke sent 😂');
+}
+
+function notifyPartnerActivity(message) {
+  if (!currentUser) return;
+  const partnerEmail = getPartnerEmail();
+  db.collection('gameActivities').add({
+    message,
+    sender: currentUser.email,
+    senderName: currentUserName,
+    recipient: partnerEmail || '',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdAtMs: Date.now()
+  }).catch(() => {});
+}
+
+function watchGameActivities() {
+  if (gameActivityUnsubscribe) gameActivityUnsubscribe();
+  gameActivityUnsubscribe = db.collection('gameActivities').orderBy('createdAtMs','desc').limit(20).onSnapshot(snap => {
+    if (!currentUser) return;
+    snap.docChanges().forEach(change => {
+      if (change.type !== 'added') return;
+      const d = change.doc.data();
+      if (d.sender === currentUser.email) return;
+      if (d.recipient && d.recipient !== currentUser.email) return;
+      const ts = d.createdAtMs || Date.now();
+      if (ts <= lastGameActivityTs) return;
+      lastGameActivityTs = ts;
+      showGameToast(d.message || 'New activity 💕');
+      sendPushNotification('Our Memories 💕', d.message || 'New activity 💕');
+    });
+  });
+}
+
+function showGameToast(message) {
+  const old = document.getElementById('game-toast');
+  if (old) old.remove();
+  const toast = document.createElement('div');
+  toast.id = 'game-toast';
+  toast.className = 'game-toast';
+  toast.textContent = message;
+  toast.onclick = () => { showSection('games'); toast.remove(); };
+  document.body.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+}
+
 </script>
 </body>
 </html>
