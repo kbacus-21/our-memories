@@ -78,8 +78,8 @@
     #logout-btn:hover{background:rgba(232,99,122,0.1)!important;}
 
     /* ── MSG BADGE ── */
-    .msg-badge{position:absolute;top:-6px;right:-6px;background:var(--rose);color:white;font-size:0.65rem;font-weight:700;min-width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg);animation:badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1);line-height:1;}
-    @keyframes badgePop{from{transform:scale(0);}to{transform:scale(1);}}
+    .msg-badge{position:absolute;top:-7px;right:-7px;background:var(--rose);color:white;font-size:0.62rem;font-weight:700;min-width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg);animation:badgePop 0.35s cubic-bezier(0.34,1.56,0.64,1);line-height:1;z-index:10;box-shadow:0 2px 8px rgba(232,99,122,0.6);}
+    @keyframes badgePop{from{transform:scale(0) rotate(-15deg);}to{transform:scale(1) rotate(0deg);}}
 
     /* ── AVATAR ── */
     .avatar-wrap{position:relative;cursor:pointer;flex-shrink:0;}
@@ -219,7 +219,7 @@
     .partner-status-text{font-size:0.75rem;}
     .partner-status-text.online{color:var(--green);}
     .partner-status-text.offline{color:var(--text-dimmer);}
-    .messages-list{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.2rem;max-height:460px;overflow-y:auto;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;}
+    .messages-list{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.2rem;max-height:460px;overflow-y:auto;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;scroll-behavior:smooth;}
     .msg-row{display:flex;gap:0.5rem;align-items:flex-end;}
     .msg-row.mine{flex-direction:row-reverse;align-self:flex-end;max-width:78%;}
     .msg-row.theirs{flex-direction:row;align-self:flex-start;max-width:78%;}
@@ -231,6 +231,11 @@
     .message-bubble{padding:0.7rem 1rem;border-radius:18px;font-size:0.92rem;line-height:1.5;word-break:break-word;}
     .message-bubble.mine{background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;border-bottom-right-radius:4px;}
     .message-bubble.theirs{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
+    /* Photo message bubble */
+    .msg-photo{max-width:220px;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid rgba(255,255,255,0.1);display:block;transition:transform 0.2s,border-color 0.2s;}
+    .msg-photo:hover{transform:scale(1.02);border-color:var(--rose);}
+    .msg-photo img{width:100%;display:block;max-height:220px;object-fit:cover;}
+    .msg-photo-caption{font-size:0.78rem;margin-top:0.3rem;opacity:0.85;font-style:italic;}
     .msg-sender{font-size:0.7rem;color:var(--text-dimmer);margin-bottom:0.1rem;}
     .msg-meta{display:flex;align-items:center;gap:0.4rem;}
     .msg-time{font-size:0.65rem;color:var(--text-dimmer);}
@@ -239,7 +244,9 @@
     .msg-seen.delivered{color:var(--text-dimmer);}
     .voice-bubble{display:flex;align-items:center;gap:0.5rem;}
     .voice-bubble audio{height:30px;max-width:180px;}
-    .message-input-area{display:flex;flex-direction:column;gap:0.5rem;}
+
+    /* ── MESSAGE INPUT AREA ── */
+    .message-input-area{display:flex;flex-direction:column;gap:0.6rem;}
     .message-input-row{display:flex;gap:0.6rem;align-items:center;}
     .message-input-row input{flex:1;padding:0.85rem 1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text);font-size:0.95rem;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
     .message-input-row input:focus{border-color:var(--rose);}
@@ -248,6 +255,24 @@
     #record-btn:hover{border-color:var(--rose);}
     #record-btn.recording{background:var(--rose);border-color:var(--rose);animation:recPulse 1s ease-in-out infinite;}
     @keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,99,122,0.4);}50%{box-shadow:0 0 0 10px rgba(232,99,122,0);}}
+
+    /* Photo send button */
+    #photo-send-btn{width:46px;height:46px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+    #photo-send-btn:hover{border-color:var(--rose);background:rgba(232,99,122,0.1);}
+
+    /* Photo preview before sending */
+    .msg-photo-preview{display:none;align-items:center;gap:0.8rem;padding:0.7rem 1rem;background:rgba(232,99,122,0.06);border:1px solid rgba(232,99,122,0.2);border-radius:14px;animation:fadeUp 0.2s ease;}
+    .msg-photo-preview.show{display:flex;}
+    .msg-photo-preview img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--rose);}
+    .msg-photo-preview-info{flex:1;display:flex;flex-direction:column;gap:0.3rem;}
+    .msg-photo-preview-name{font-size:0.8rem;color:var(--text-dim);}
+    .msg-photo-preview input{padding:0.4rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;outline:none;font-family:'DM Sans',sans-serif;width:100%;}
+    .msg-photo-preview input:focus{border-color:var(--rose);}
+    .msg-photo-preview input::placeholder{color:var(--text-dimmer);}
+    .msg-photo-preview-actions{display:flex;gap:0.5rem;}
+    .msg-photo-preview-actions button{padding:0.4rem 0.9rem;border-radius:50px;font-size:0.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
+    .btn-send-photo{background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;}
+    .btn-cancel-photo{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border)!important;}
 
     /* ── PROFILE MODAL ── */
     .modal-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
@@ -262,6 +287,10 @@
     .profile-preview-placeholder{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-dark));display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:white;border:3px solid var(--rose);}
     .profile-upload-label{padding:0.5rem 1.2rem;background:transparent;border:1px solid var(--gold-dim);border-radius:50px;color:var(--gold);font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-align:center;}
     .profile-upload-label:hover{background:rgba(240,200,160,0.1);}
+
+    /* New message notification toast */
+    .new-msg-toast{position:fixed;bottom:2rem;right:1.5rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;padding:0.7rem 1.2rem;border-radius:50px;font-size:0.85rem;box-shadow:0 8px 24px rgba(232,99,122,0.45);z-index:5000;animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;display:flex;align-items:center;gap:0.5rem;}
+    @keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(0.9);}to{opacity:1;transform:translateY(0) scale(1);}}
 
     ::-webkit-scrollbar{width:3px;}
     ::-webkit-scrollbar-thumb{background:rgba(232,99,122,0.4);border-radius:2px;}
@@ -443,9 +472,26 @@
         </div>
       </div>
       <div id="messages-list" class="messages-list"></div>
+
+      <!-- Photo preview strip (shown when a photo is chosen) -->
+      <div class="msg-photo-preview" id="msg-photo-preview">
+        <img id="msg-photo-preview-img" src="" alt=""/>
+        <div class="msg-photo-preview-info">
+          <div class="msg-photo-preview-name" id="msg-photo-preview-name"></div>
+          <input type="text" id="msg-photo-caption-input" placeholder="Add a caption... (optional)"/>
+        </div>
+        <div class="msg-photo-preview-actions">
+          <button class="btn-cancel-photo" onclick="cancelPhotoSend()">✕</button>
+          <button class="btn-send-photo" onclick="sendPhotoMessage()">Send 📷</button>
+        </div>
+      </div>
+
       <div class="message-input-area">
         <div class="message-input-row">
           <input type="text" id="message-text" placeholder="Say something sweet..."/>
+          <!-- Hidden file input for photo -->
+          <input type="file" id="msg-photo-input" accept="image/*" style="display:none" onchange="previewMsgPhoto(this)"/>
+          <button id="photo-send-btn" title="Send a photo" onclick="document.getElementById('msg-photo-input').click()">📷</button>
           <button id="record-btn" title="Click to record voice" onclick="toggleRecording()">🎙️</button>
           <button class="send-btn" onclick="sendMessage()">Send 💕</button>
         </div>
@@ -476,13 +522,7 @@ const ALLOWED_USERS = {
   'kyla@gmail.com': 'Kyla'
 };
 const ANNIVERSARY = { month: 11, day: 1, year: 2023 };
-
-// ── ONLINE TIMEOUT: considered online if lastSeen within 2 minutes ──
-// FIX 1: This replaces the unreliable beforeunload approach.
-// We ping every 60s and consider someone online only if their lastSeen
-// timestamp is within the last 2 minutes. This way if they close the tab
-// without triggering beforeunload, they'll auto-appear offline within 2min.
-const ONLINE_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
+const ONLINE_TIMEOUT_MS = 2 * 60 * 1000;
 
 let currentUser = null;
 let currentUserName = '';
@@ -498,6 +538,11 @@ let messagesUnsubscribe = null;
 let unreadCount = 0;
 let unreadUnsubscribe = null;
 let heartbeatInterval = null;
+let latestMessageDocs = [];
+const avatarCache = {};
+
+// For photo sending in chat
+let pendingPhotoBase64 = null;
 
 // ── AUTH ──
 auth.onAuthStateChanged((user) => {
@@ -514,10 +559,8 @@ auth.onAuthStateChanged((user) => {
     loadMyProfile();
     watchPartnerStatus();
     watchUnreadMessages();
-    // FIX 1: heartbeat every 60s — keeps lastSeen fresh while tab is open
     if (heartbeatInterval) clearInterval(heartbeatInterval);
     heartbeatInterval = setInterval(() => { if (currentUser) setOnline(); }, 60000);
-    // FIX 1: on page hide/close, write a past timestamp so partner sees offline quickly
     document.addEventListener('visibilitychange', handleVisibilityChange);
   } else {
     currentUser = null;
@@ -530,14 +573,11 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-// FIX 1: when tab is hidden or closed, write a stale lastSeen so partner goes offline quickly
 function handleVisibilityChange() {
   if (document.hidden && currentUser) {
-    // Write lastSeen 3 minutes in the past → partner's snapshot will see them as offline
     const staleTime = new Date(Date.now() - ONLINE_TIMEOUT_MS - 10000);
     db.collection('presence').doc(currentUser.email).set({
-      lastSeen: staleTime,
-      name: currentUserName
+      lastSeen: staleTime, name: currentUserName
     }, { merge: true }).catch(() => {});
   } else if (!document.hidden && currentUser) {
     setOnline();
@@ -562,16 +602,12 @@ document.getElementById('register-btn').onclick = function() {
 };
 document.getElementById('logout-btn').onclick = () => {
   if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
-  // FIX 1: on explicit logout, write stale timestamp
   if (currentUser) {
     const staleTime = new Date(Date.now() - ONLINE_TIMEOUT_MS - 10000);
     db.collection('presence').doc(currentUser.email).set({
-      lastSeen: staleTime,
-      name: currentUserName
+      lastSeen: staleTime, name: currentUserName
     }, { merge: true }).finally(() => auth.signOut());
-  } else {
-    auth.signOut();
-  }
+  } else { auth.signOut(); }
 };
 
 // ── NAV ──
@@ -581,16 +617,21 @@ function showSection(name) {
   document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active-nav'));
   const nb = document.getElementById('nav-' + name);
   if (nb) nb.classList.add('active-nav');
-  if (name === 'messages') markMessagesSeen();
+  if (name === 'messages') {
+    markMessagesSeen();
+    // Scroll to bottom when entering messages tab
+    setTimeout(() => {
+      const list = document.getElementById('messages-list');
+      if (list) list.scrollTop = list.scrollHeight;
+    }, 50);
+  }
 }
 
 function loadAll() {
   loadAlbums(); loadNotes(); loadTimeline(); loadMessages(); fetchAllPhotos();
 }
 
-// ── ONLINE STATUS (FIX 1) ──
-// We no longer store a boolean online:true/false.
-// We only write lastSeen. The watcher decides "online" = lastSeen < 2min ago.
+// ── ONLINE STATUS ──
 function setOnline() {
   if (!currentUser) return;
   db.collection('presence').doc(currentUser.email).set({
@@ -598,9 +639,6 @@ function setOnline() {
     name: currentUserName
   }, { merge: true }).catch(() => {});
 }
-
-// FIX 2: Avatar cache — when a photo changes, re-render the message list
-const avatarCache = {};
 
 function watchPartnerStatus() {
   const partnerEmail = Object.keys(ALLOWED_USERS).find(e => e !== currentUser.email.toLowerCase());
@@ -611,15 +649,12 @@ function watchPartnerStatus() {
   onlineUnsubscribe = db.collection('presence').doc(partnerEmail).onSnapshot(doc => {
     const dot = document.getElementById('partner-dot');
     const txt = document.getElementById('partner-status-text');
-
-    // FIX 1: determine online by checking if lastSeen is within ONLINE_TIMEOUT_MS
     let isOnline = false;
     let lastSeenDate = null;
     if (doc.exists && doc.data().lastSeen) {
       lastSeenDate = doc.data().lastSeen.toDate();
       isOnline = (Date.now() - lastSeenDate.getTime()) < ONLINE_TIMEOUT_MS;
     }
-
     if (isOnline) {
       dot.className = 'status-dot online';
       txt.textContent = '🟢 Online now';
@@ -631,42 +666,25 @@ function watchPartnerStatus() {
         : 'Offline';
       txt.className = 'partner-status-text offline';
     }
-
-    // FIX 2: update partner avatar — update cache and re-render messages
     const newPhoto = doc.exists && doc.data().photoUrl ? doc.data().photoUrl : null;
     const photoChanged = avatarCache[partnerEmail] !== newPhoto;
     avatarCache[partnerEmail] = newPhoto;
-
-    // Update partner status bar avatar
     const img = document.getElementById('partner-nav-avatar');
     const ph = document.getElementById('partner-nav-placeholder');
-    if (newPhoto) {
-      img.src = newPhoto;
-      img.style.display = 'block';
-      ph.style.display = 'none';
-    } else {
-      img.style.display = 'none';
-      ph.style.display = 'flex';
-    }
-
-    // If photo changed, re-render messages to show new avatar
-    if (photoChanged && messagesUnsubscribe) {
-      renderMessages();
-    }
+    if (newPhoto) { img.src = newPhoto; img.style.display = 'block'; ph.style.display = 'none'; }
+    else { img.style.display = 'none'; ph.style.display = 'flex'; }
+    if (photoChanged && messagesUnsubscribe) renderMessages();
   });
 
-  // Also watch our own photo for message re-render
   db.collection('presence').doc(currentUser.email).onSnapshot(doc => {
     const newPhoto = doc.exists && doc.data().photoUrl ? doc.data().photoUrl : null;
     const photoChanged = avatarCache[currentUser.email] !== newPhoto;
     avatarCache[currentUser.email] = newPhoto;
-    if (photoChanged && messagesUnsubscribe) {
-      renderMessages();
-    }
+    if (photoChanged && messagesUnsubscribe) renderMessages();
   });
 }
 
-// ── PROFILE PICTURE (PERSISTENT via Firestore) ──
+// ── PROFILE ──
 function loadMyProfile() {
   db.collection('presence').doc(currentUser.email).get().then(doc => {
     if (doc.exists && doc.data().photoUrl) {
@@ -675,20 +693,12 @@ function loadMyProfile() {
     }
   });
 }
-
 function setNavAvatar(who, url) {
   const img = document.getElementById(who + '-nav-avatar');
   const ph = document.getElementById(who + '-nav-placeholder');
-  if (url) {
-    img.src = url;
-    img.style.display = 'block';
-    ph.style.display = 'none';
-  } else {
-    img.style.display = 'none';
-    ph.style.display = 'flex';
-  }
+  if (url) { img.src = url; img.style.display = 'block'; ph.style.display = 'none'; }
+  else { img.style.display = 'none'; ph.style.display = 'flex'; }
 }
-
 function openProfileModal() {
   document.getElementById('profile-modal').classList.add('open');
   profilePicBase64 = null;
@@ -704,12 +714,10 @@ function openProfileModal() {
     }
   });
 }
-
 function closeProfileModal() {
   document.getElementById('profile-modal').classList.remove('open');
   document.getElementById('profile-pic-input').value = '';
 }
-
 function previewProfilePic(input) {
   const file = input.files[0];
   if (!file) return;
@@ -723,7 +731,6 @@ function previewProfilePic(input) {
   };
   reader.readAsDataURL(file);
 }
-
 function saveProfilePic() {
   if (!profilePicBase64) { closeProfileModal(); return; }
   db.collection('presence').doc(currentUser.email).set({
@@ -734,7 +741,7 @@ function saveProfilePic() {
     avatarCache[currentUser.email] = profilePicBase64;
     setNavAvatar('my', profilePicBase64);
     closeProfileModal();
-    renderMessages(); // FIX 2: re-render messages with new avatar immediately
+    renderMessages();
   });
 }
 
@@ -746,7 +753,12 @@ function watchUnreadMessages() {
     .where('sender', '==', partnerEmail)
     .where('seen', '==', false)
     .onSnapshot(snap => {
-      unreadCount = snap.size;
+      const newCount = snap.size;
+      // Show toast only when new messages arrive and we're NOT on messages tab
+      if (newCount > unreadCount && !document.getElementById('messages').classList.contains('active')) {
+        showNewMessageToast(newCount);
+      }
+      unreadCount = newCount;
       updateMessageBadge(unreadCount);
     });
 }
@@ -765,6 +777,20 @@ function updateMessageBadge(count) {
   } else {
     document.title = 'Our Memories 💕';
   }
+}
+
+// Toast that appears when new message arrives on other tabs
+function showNewMessageToast(count) {
+  const existing = document.getElementById('new-msg-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'new-msg-toast';
+  toast.className = 'new-msg-toast';
+  toast.innerHTML = `💌 ${count} new message${count > 1 ? 's' : ''} — tap to read`;
+  toast.onclick = () => { showSection('messages'); toast.remove(); };
+  document.body.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+  sendPushNotification('💌 New message', `You have ${count} new message${count > 1 ? 's' : ''} from your love 💕`);
 }
 
 // ── SEEN RECEIPTS ──
@@ -1139,9 +1165,46 @@ function addTimelineComment(eventId) {
 }
 function deleteTimelineComment(eventId, commentId) { db.collection('timeline').doc(eventId).collection('comments').doc(commentId).delete(); }
 
+// ══════════════════════════════════════════
 // ── MESSAGES ──
-// FIX 2: Store the latest Firestore snapshot so renderMessages() can redraw without re-querying
-let latestMessageDocs = [];
+// ══════════════════════════════════════════
+
+// ── PHOTO IN CHAT: Preview before send ──
+function previewMsgPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pendingPhotoBase64 = e.target.result;
+    const preview = document.getElementById('msg-photo-preview');
+    document.getElementById('msg-photo-preview-img').src = pendingPhotoBase64;
+    document.getElementById('msg-photo-preview-name').textContent = '📷 ' + file.name;
+    document.getElementById('msg-photo-caption-input').value = '';
+    preview.classList.add('show');
+    document.getElementById('msg-photo-caption-input').focus();
+  };
+  reader.readAsDataURL(file);
+}
+
+function cancelPhotoSend() {
+  pendingPhotoBase64 = null;
+  document.getElementById('msg-photo-preview').classList.remove('show');
+  document.getElementById('msg-photo-input').value = '';
+}
+
+function sendPhotoMessage() {
+  if (!pendingPhotoBase64 || !currentUser) return;
+  const caption = document.getElementById('msg-photo-caption-input').value.trim();
+  db.collection('messages').add({
+    type: 'photo',
+    photoUrl: pendingPhotoBase64,
+    caption: caption,
+    sender: currentUser.email,
+    senderName: currentUserName,
+    seen: false,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => { cancelPhotoSend(); });
+}
 
 function sendMessage(voiceUrl) {
   if (voiceUrl) {
@@ -1149,59 +1212,75 @@ function sendMessage(voiceUrl) {
     db.collection('messages').add({type:'voice',audioUrl:voiceUrl,sender:currentUser.email,senderName:currentUserName,seen:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     return;
   }
-  const text=document.getElementById('message-text').value.trim();
-  if(!text||!currentUser) return;
+  const text = document.getElementById('message-text').value.trim();
+  if (!text || !currentUser) return;
   db.collection('messages').add({type:'text',text,sender:currentUser.email,senderName:currentUserName,seen:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-  document.getElementById('message-text').value='';
+  document.getElementById('message-text').value = '';
 }
 
-document.getElementById('message-text').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
+document.getElementById('message-text').addEventListener('keydown', e => { if(e.key==='Enter') sendMessage(); });
 
-function loadMessages(){
+// ── Real-time listener — auto-scrolls to newest on first load ──
+let isFirstLoad = true;
+
+function loadMessages() {
   if (messagesUnsubscribe) messagesUnsubscribe();
-  messagesUnsubscribe = db.collection('messages').orderBy('createdAt','asc').onSnapshot(snap=>{
-    latestMessageDocs = snap.docs; // FIX 2: cache docs
+  isFirstLoad = true;
+  messagesUnsubscribe = db.collection('messages').orderBy('createdAt','asc').onSnapshot(snap => {
+    latestMessageDocs = snap.docs;
     renderMessages();
-    if(document.getElementById('messages').classList.contains('active')) markMessagesSeen();
+    if (document.getElementById('messages').classList.contains('active')) markMessagesSeen();
   });
 }
 
-// FIX 2: Separate render function — called by both loadMessages and avatar changes
 function renderMessages() {
   const list = document.getElementById('messages-list');
   if (!list || !currentUser) return;
-  const scrolledToBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+
+  // Determine if user was near the bottom before re-render
+  const wasAtBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+
   list.innerHTML = '';
   const docs = latestMessageDocs;
-  docs.forEach((doc,i) => {
+
+  docs.forEach((doc, i) => {
     const d = doc.data();
     const isMine = d.sender === currentUser.email;
     const ts = d.createdAt ? d.createdAt.toDate() : new Date();
     const timeStr = ts.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-    // FIX 2: always pull latest photo from cache
     const photo = avatarCache[d.sender] || null;
     const initials = (d.senderName||'?').charAt(0);
     const avatarHtml = photo
       ? `<img class="msg-avatar" src="${escAttr(photo)}" alt=""/>`
       : `<div class="msg-avatar-placeholder">${escHtml(initials)}</div>`;
+
     let content = '';
-    if(d.type==='voice'&&d.audioUrl){
-      content=`<div class="voice-bubble"><span>🎙️</span><audio controls src="${escAttr(d.audioUrl)}"></audio></div>`;
+    if (d.type === 'photo' && d.photoUrl) {
+      // Photo message
+      const cap = d.caption ? `<div class="msg-photo-caption">${escHtml(d.caption)}</div>` : '';
+      content = `<div class="msg-photo" onclick="openLightbox('${escAttr(d.photoUrl)}')">
+        <img src="${escAttr(d.photoUrl)}" alt="photo" loading="lazy"/>
+      </div>${cap}`;
+    } else if (d.type === 'voice' && d.audioUrl) {
+      content = `<div class="voice-bubble"><span>🎙️</span><audio controls src="${escAttr(d.audioUrl)}"></audio></div>`;
     } else {
-      content=escHtml(d.text||'');
+      content = escHtml(d.text||'');
     }
+
+    // Seen indicator — only for last message from me
     let seenHtml = '';
-    if(isMine){
-      const isLast = docs.slice(i+1).every(nd=>nd.data().sender!==currentUser.email);
-      if(isLast){
-        seenHtml=`<div class="msg-meta"><span class="msg-time">${timeStr}</span><span class="msg-seen ${d.seen?'seen':'delivered'}">${d.seen?'✓✓ Seen':'✓ Sent'}</span></div>`;
+    if (isMine) {
+      const isLast = docs.slice(i+1).every(nd => nd.data().sender !== currentUser.email);
+      if (isLast) {
+        seenHtml = `<div class="msg-meta"><span class="msg-time">${timeStr}</span><span class="msg-seen ${d.seen?'seen':'delivered'}">${d.seen?'✓✓ Seen':'✓ Sent'}</span></div>`;
       } else {
-        seenHtml=`<div class="msg-time">${timeStr}</div>`;
+        seenHtml = `<div class="msg-time">${timeStr}</div>`;
       }
     } else {
-      seenHtml=`<div class="msg-time">${timeStr}</div>`;
+      seenHtml = `<div class="msg-time">${timeStr}</div>`;
     }
-    list.innerHTML+=`<div class="msg-row ${isMine?'mine':'theirs'}">
+
+    list.innerHTML += `<div class="msg-row ${isMine?'mine':'theirs'}">
       ${avatarHtml}
       <div class="msg-bubble-wrap">
         <div class="msg-sender">${escHtml(d.senderName||d.sender)}</div>
@@ -1210,48 +1289,53 @@ function renderMessages() {
       </div>
     </div>`;
   });
-  if (scrolledToBottom) list.scrollTop = list.scrollHeight;
+
+  // Auto-scroll: always scroll to bottom on first load, or if user was near bottom
+  if (isFirstLoad || wasAtBottom) {
+    list.scrollTop = list.scrollHeight;
+    isFirstLoad = false;
+  }
 }
 
 // ── VOICE RECORDING ──
-async function toggleRecording(){
-  const btn=document.getElementById('record-btn');
-  const status=document.getElementById('record-status');
-  if(mediaRecorder&&mediaRecorder.state==='recording'){
+async function toggleRecording() {
+  const btn = document.getElementById('record-btn');
+  const status = document.getElementById('record-status');
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
     mediaRecorder.stop();
     btn.classList.remove('recording');
-    btn.textContent='🎙️';
+    btn.textContent = '🎙️';
     clearInterval(recordingTimer);
-    status.textContent='🎙️ Click mic to start recording';
-    status.style.color='var(--text-dimmer)';
+    status.textContent = '🎙️ Click mic to start recording';
+    status.style.color = 'var(--text-dimmer)';
   } else {
-    try{
-      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-      mediaRecorder=new MediaRecorder(stream);
-      audioChunks=[];
-      mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)audioChunks.push(e.data);};
-      mediaRecorder.onstop=()=>{
-        if(!audioChunks.length)return;
-        const blob=new Blob(audioChunks,{type:'audio/webm'});
-        if(blob.size<500)return;
-        const reader=new FileReader();
-        reader.onload=()=>sendMessage(reader.result);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e => { if(e.data&&e.data.size>0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = () => {
+        if (!audioChunks.length) return;
+        const blob = new Blob(audioChunks, {type:'audio/webm'});
+        if (blob.size < 500) return;
+        const reader = new FileReader();
+        reader.onload = () => sendMessage(reader.result);
         reader.readAsDataURL(blob);
-        stream.getTracks().forEach(t=>t.stop());
-        audioChunks=[];
+        stream.getTracks().forEach(t => t.stop());
+        audioChunks = [];
       };
       mediaRecorder.start(100);
-      btn.classList.add('recording'); btn.textContent='⏹️';
-      recordingSeconds=0;
-      status.style.color='var(--rose)';
-      recordingTimer=setInterval(()=>{
+      btn.classList.add('recording'); btn.textContent = '⏹️';
+      recordingSeconds = 0;
+      status.style.color = 'var(--rose)';
+      recordingTimer = setInterval(() => {
         recordingSeconds++;
-        const m=String(Math.floor(recordingSeconds/60)).padStart(2,'0');
-        const s=String(recordingSeconds%60).padStart(2,'0');
-        status.textContent=`⏺️ Recording... ${m}:${s} — click ⏹️ to send`;
-      },1000);
-      status.textContent='⏺️ Recording... 00:00 — click ⏹️ to send';
-    }catch(err){alert('Microphone access denied. Please allow mic access.');}
+        const m = String(Math.floor(recordingSeconds/60)).padStart(2,'0');
+        const s = String(recordingSeconds%60).padStart(2,'0');
+        status.textContent = `⏺️ Recording... ${m}:${s} — click ⏹️ to send`;
+      }, 1000);
+      status.textContent = '⏺️ Recording... 00:00 — click ⏹️ to send';
+    } catch(err) { alert('Microphone access denied. Please allow mic access.'); }
   }
 }
 
@@ -1259,7 +1343,7 @@ async function toggleRecording(){
 function escHtml(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function escAttr(str){return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,'').replace(/\r/g,'');}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeSlideshow();closeCelebration();}});
+document.addEventListener('keydown', e => { if(e.key==='Escape'){closeLightbox();closeSlideshow();closeCelebration();} });
 </script>
 </body>
 </html>
