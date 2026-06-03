@@ -330,6 +330,10 @@
     .pong-vs{color:var(--rose);font-family:'Cormorant Garamond',serif;font-size:1.5rem;}
     .pong-mode-btn.active{background:rgba(232,99,122,0.18)!important;border-color:var(--rose)!important;color:var(--text)!important;}
     .pong-settings-note{font-size:0.78rem;color:var(--text-dimmer);margin-top:0.4rem;}
+.pong-online-panel{display:none;margin-top:1rem;padding:1rem;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.035);}
+.pong-online-panel.show{display:block;animation:fadeUp 0.2s ease;}
+.pong-room-code{font-family:'DM Sans',sans-serif;font-size:1.3rem;letter-spacing:0.14em;color:var(--gold);background:rgba(240,200,160,0.08);border:1px dashed var(--gold-dim);border-radius:12px;padding:0.7rem 1rem;text-align:center;}
+.pong-online-status{font-size:0.84rem;color:var(--text-dim);line-height:1.55;margin-top:0.7rem;}
     .game-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.7rem;margin-top:1rem;}
     .game-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:0.8rem;text-align:center;}
     .game-stat strong{display:block;color:var(--gold);font-size:1.1rem;}
@@ -618,6 +622,7 @@
               <div class="game-row">
                 <button class="btn-gold pong-mode-btn active" id="pong-mode-ai" onclick="setPongMode('ai')">Practice vs AI</button>
                 <button class="btn-gold pong-mode-btn" id="pong-mode-local" onclick="setPongMode('local')">1v1 Same Keyboard</button>
+                <button class="btn-gold pong-mode-btn" id="pong-mode-online" onclick="setPongMode('online')">Online 1v1</button>
               </div>
 
               <div class="game-row">
@@ -628,6 +633,17 @@
                 <button class="btn-danger" onclick="resetPongGame()">Reset</button>
               </div>
               <div class="pong-settings-note">You can change the score target before each match. Example: first to 5, then next match first to 10.</div>
+
+              <div class="pong-online-panel" id="pong-online-panel">
+                <div class="game-row">
+                  <button class="btn-rose" onclick="createPongOnlineRoom()">Create Room</button>
+                  <input type="text" id="pong-room-input" placeholder="Enter room code" maxlength="6" autocomplete="off"/>
+                  <button class="btn-gold" onclick="joinPongOnlineRoom()">Join Room</button>
+                  <button class="btn-danger" onclick="leavePongOnlineRoom()">Leave</button>
+                </div>
+                <div class="pong-room-code" id="pong-room-code-display">NO ROOM</div>
+                <div class="pong-online-status" id="pong-online-status">Create a room, send the code, then start when both players are inside.</div>
+              </div>
 
               <div class="pong-scoreboard" style="margin-top:1rem;">
                 <div class="pong-player-score"><strong id="pong-left-score">0</strong><span id="pong-left-name">You</span></div>
@@ -1581,6 +1597,379 @@ async function toggleRecording() {
 function escHtml(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function escAttr(str){return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,'').replace(/\r/g,'');}
 
+
+function generatePongRoomCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function updatePongOnlineStatus(message) {
+  const el = document.getElementById('pong-online-status');
+  if (el) el.textContent = message;
+}
+
+function updatePongRoomCodeDisplay(code) {
+  const el = document.getElementById('pong-room-code-display');
+  if (el) el.textContent = code || 'NO ROOM';
+}
+
+function pongStateForFirestore() {
+  const s = createPongState();
+  return {
+    left: { y: s.left.y, score: 0 },
+    right: { y: s.right.y, score: 0 },
+    ball: { x: s.ball.x, y: s.ball.y, vx: s.ball.vx, vy: s.ball.vy },
+    status: 'waiting'
+  };
+}
+
+function applyOnlineDataToPongState(data) {
+  if (!pongState) pongState = createPongState();
+  pongScoreToWin = data.scoreToWin || pongScoreToWin || 5;
+  pongState.left.y = Number(data.left?.y ?? pongState.left.y);
+  pongState.right.y = Number(data.right?.y ?? pongState.right.y);
+  pongState.left.score = Number(data.left?.score ?? 0);
+  pongState.right.score = Number(data.right?.score ?? 0);
+  pongState.leftName = data.p1Name || 'Player 1';
+  pongState.rightName = data.p2Name || 'Waiting...';
+  if (data.ball) {
+    pongState.ball.x = Number(data.ball.x ?? pongState.ball.x);
+    pongState.ball.y = Number(data.ball.y ?? pongState.ball.y);
+    pongState.ball.vx = Number(data.ball.vx ?? pongState.ball.vx);
+    pongState.ball.vy = Number(data.ball.vy ?? pongState.ball.vy);
+  }
+  updatePongNames();
+  updatePongScoreUI();
+}
+
+async function createPongOnlineRoom() {
+  if (!currentUser) return;
+  if (pongRunning) return;
+  pongScoreToWin = getPongTargetFromInput();
+  leavePongOnlineRoom(false);
+
+  let code = generatePongRoomCode();
+  let ref = db.collection('pongRooms').doc(code);
+  let existing = await ref.get();
+  while (existing.exists) {
+    code = generatePongRoomCode();
+    ref = db.collection('pongRooms').doc(code);
+    existing = await ref.get();
+  }
+
+  const base = pongStateForFirestore();
+  await ref.set({
+    roomCode: code,
+    createdBy: currentUser.email,
+    p1Email: currentUser.email,
+    p1Name: currentUserName || currentUser.email,
+    p2Email: null,
+    p2Name: null,
+    scoreToWin: pongScoreToWin,
+    ...base,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  pongOnlineRoomCode = code;
+  pongOnlineSide = 'p1';
+  pongOnlineMatchSaved = false;
+  updatePongRoomCodeDisplay(code);
+  updatePongOnlineStatus('Room created. Send this code to your partner. Start Match when Player 2 joins.');
+  document.getElementById('pong-room-input').value = code;
+  listenToPongOnlineRoom(code);
+  notifyPartnerActivity((currentUserName || 'Player 1') + ' created Pong room ' + code + ' 🏓');
+}
+
+async function joinPongOnlineRoom() {
+  if (!currentUser) return;
+  if (pongRunning) return;
+  const input = document.getElementById('pong-room-input');
+  const code = (input?.value || '').trim().toUpperCase();
+  if (!code) {
+    updatePongOnlineStatus('Enter the room code first.');
+    return;
+  }
+
+  const ref = db.collection('pongRooms').doc(code);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    updatePongOnlineStatus('Room not found. Check the code and try again.');
+    return;
+  }
+  const room = snap.data();
+  if (room.p1Email === currentUser.email) {
+    pongOnlineRoomCode = code;
+    pongOnlineSide = 'p1';
+    updatePongRoomCodeDisplay(code);
+    listenToPongOnlineRoom(code);
+    updatePongOnlineStatus('You are Player 1 in this room.');
+    return;
+  }
+  if (room.p2Email && room.p2Email !== currentUser.email) {
+    updatePongOnlineStatus('This room already has two players.');
+    return;
+  }
+
+  await ref.set({
+    p2Email: currentUser.email,
+    p2Name: currentUserName || currentUser.email,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  pongOnlineRoomCode = code;
+  pongOnlineSide = 'p2';
+  pongOnlineMatchSaved = false;
+  updatePongRoomCodeDisplay(code);
+  listenToPongOnlineRoom(code);
+  updatePongOnlineStatus('Joined room. Wait for Player 1 to start the match.');
+  notifyPartnerActivity((currentUserName || 'Player 2') + ' joined Pong room ' + code + ' 🏓');
+}
+
+function listenToPongOnlineRoom(code) {
+  if (pongOnlineUnsub) pongOnlineUnsub();
+  pongOnlineUnsub = db.collection('pongRooms').doc(code).onSnapshot(doc => {
+    if (!doc.exists) {
+      updatePongOnlineStatus('Room was closed or deleted.');
+      leavePongOnlineRoom(false);
+      return;
+    }
+
+    const data = doc.data();
+    applyOnlineDataToPongState(data);
+    updatePongRoomCodeDisplay(code);
+
+    const p1 = data.p1Name || 'Player 1';
+    const p2 = data.p2Name || 'Waiting...';
+    const role = pongOnlineSide === 'p1' ? 'You are Player 1 / host.' : 'You are Player 2.';
+    const base = `${role} ${p1} vs ${p2}. First to ${data.scoreToWin || 5}.`;
+
+    if (data.status === 'waiting') {
+      pongRunning = false;
+      stopPongLoop();
+      updatePongOnlineStatus(base + (data.p2Email ? ' Ready to start.' : ' Waiting for Player 2.'));
+      drawPongIdle();
+    } else if (data.status === 'playing') {
+      if (!pongRunning) {
+        pongRunning = true;
+        stopPongLoop();
+        pongLoop();
+      }
+      updatePongOnlineStatus(base + ' Match live.');
+      document.getElementById('pong-status').textContent = pongOnlineSide === 'p1'
+        ? 'Online match live. You control the left paddle with W/S or ↑/↓.'
+        : 'Online match live. You control the right paddle with W/S or ↑/↓.';
+    } else if (data.status === 'ended') {
+      pongRunning = false;
+      stopPongLoop();
+      updatePongOnlineStatus(base + ' Match ended. Winner: ' + (data.winnerName || 'Unknown') + '.');
+      document.getElementById('pong-status').textContent = (data.winnerName || 'Someone') + ' wins online Pong!';
+      drawPongFrame();
+      drawPongWinnerOverlay(data.winnerName || 'Winner', data.left?.score || 0, data.right?.score || 0);
+      savePongOnlineWinIfNeeded(data);
+    }
+  });
+}
+
+async function startPongOnlineMatch() {
+  if (!pongOnlineRoomCode || !pongOnlineSide) {
+    updatePongOnlineStatus('Create or join a room first.');
+    return;
+  }
+  if (pongOnlineSide !== 'p1') {
+    updatePongOnlineStatus('Only Player 1 / room creator can start the online match.');
+    return;
+  }
+
+  const ref = db.collection('pongRooms').doc(pongOnlineRoomCode);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    updatePongOnlineStatus('Room not found anymore.');
+    return;
+  }
+  const room = snap.data();
+  if (!room.p2Email) {
+    updatePongOnlineStatus('Wait until Player 2 joins before starting.');
+    return;
+  }
+
+  pongScoreToWin = getPongTargetFromInput();
+  pongState = createPongState();
+  pongState.left.score = 0;
+  pongState.right.score = 0;
+  pongWinnerSaved = false;
+  pongOnlineMatchSaved = false;
+  const input = document.getElementById('pong-score-to-win');
+  if (input) input.disabled = true;
+
+  await ref.set({
+    scoreToWin: pongScoreToWin,
+    status: 'playing',
+    left: { y: pongState.left.y, score: 0 },
+    right: { y: pongState.right.y, score: 0 },
+    ball: {
+      x: pongState.ball.x,
+      y: pongState.ball.y,
+      vx: pongState.ball.vx,
+      vy: pongState.ball.vy
+    },
+    winnerEmail: null,
+    winnerName: null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  setGamePresence(true, 'Online Pong');
+  notifyPartnerActivity((currentUserName || 'Player 1') + ' started online Pong room ' + pongOnlineRoomCode + ' 🏓');
+}
+
+async function resetPongOnlineRoom() {
+  if (!pongOnlineRoomCode || pongOnlineSide !== 'p1') {
+    updatePongOnlineStatus('Only Player 1 can reset the online room.');
+    return;
+  }
+  pongRunning = false;
+  stopPongLoop();
+  pongScoreToWin = getPongTargetFromInput();
+  pongState = createPongState();
+  const ref = db.collection('pongRooms').doc(pongOnlineRoomCode);
+  await ref.set({
+    status: 'waiting',
+    scoreToWin: pongScoreToWin,
+    left: { y: pongState.left.y, score: 0 },
+    right: { y: pongState.right.y, score: 0 },
+    ball: { x: pongState.ball.x, y: pongState.ball.y, vx: pongState.ball.vx, vy: pongState.ball.vy },
+    winnerEmail: null,
+    winnerName: null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+  const input = document.getElementById('pong-score-to-win');
+  if (input) input.disabled = false;
+  updatePongOnlineStatus('Room reset. Change score to win if needed, then Start Match.');
+}
+
+function leavePongOnlineRoom(showMessage = true) {
+  if (pongOnlineUnsub) pongOnlineUnsub();
+  pongOnlineUnsub = null;
+  pongOnlineRoomCode = null;
+  pongOnlineSide = null;
+  pongOnlineMatchSaved = false;
+  stopPongLoop();
+  pongRunning = false;
+  updatePongRoomCodeDisplay(null);
+  const input = document.getElementById('pong-score-to-win');
+  if (input) input.disabled = false;
+  if (showMessage) updatePongOnlineStatus('Left the online room.');
+}
+
+function movePongOnlinePaddle() {
+  if (!pongState) return;
+  const s = pongState;
+  const controlsUp = pongKeys.w || pongKeys.up;
+  const controlsDown = pongKeys.s || pongKeys.down;
+  const paddle = pongOnlineSide === 'p2' ? s.right : s.left;
+  if (controlsUp) paddle.y -= s.paddleSpeed;
+  if (controlsDown) paddle.y += s.paddleSpeed;
+  clampPaddle(paddle);
+}
+
+function shouldWriteOnline(intervalMs) {
+  const now = Date.now();
+  if (now - pongOnlineLastWrite < intervalMs) return false;
+  pongOnlineLastWrite = now;
+  return true;
+}
+
+function shouldWriteOnlineState(intervalMs) {
+  const now = Date.now();
+  if (now - pongOnlineLastStateWrite < intervalMs) return false;
+  pongOnlineLastStateWrite = now;
+  return true;
+}
+
+async function writeMyOnlinePaddle() {
+  if (!pongOnlineRoomCode || !pongOnlineSide || !pongState || !shouldWriteOnline(55)) return;
+  const ref = db.collection('pongRooms').doc(pongOnlineRoomCode);
+  const field = pongOnlineSide === 'p2' ? 'right.y' : 'left.y';
+  const p = pongOnlineSide === 'p2' ? pongState.right : pongState.left;
+  try {
+    await ref.update({
+      [field]: p.y,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    console.warn('Pong paddle sync failed', err);
+  }
+}
+
+async function writeHostOnlineState() {
+  if (pongOnlineSide !== 'p1' || !pongOnlineRoomCode || !pongState || !shouldWriteOnlineState(65)) return;
+  const ref = db.collection('pongRooms').doc(pongOnlineRoomCode);
+  try {
+    await ref.set({
+      left: { y: pongState.left.y, score: pongState.left.score },
+      right: { y: pongState.right.y, score: pongState.right.score },
+      ball: {
+        x: pongState.ball.x,
+        y: pongState.ball.y,
+        vx: pongState.ball.vx,
+        vy: pongState.ball.vy
+      },
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (err) {
+    console.warn('Pong state sync failed', err);
+  }
+}
+
+async function endPongOnlineMatch(winnerSide) {
+  if (!pongOnlineRoomCode || pongOnlineSide !== 'p1' || !pongState) return;
+  const ref = db.collection('pongRooms').doc(pongOnlineRoomCode);
+  const snap = await ref.get();
+  const room = snap.exists ? snap.data() : {};
+  const winnerEmail = winnerSide === 'p1' ? room.p1Email : room.p2Email;
+  const winnerName = winnerSide === 'p1' ? room.p1Name : room.p2Name;
+  await ref.set({
+    status: 'ended',
+    winnerEmail: winnerEmail || null,
+    winnerName: winnerName || 'Winner',
+    left: { y: pongState.left.y, score: pongState.left.score },
+    right: { y: pongState.right.y, score: pongState.right.score },
+    ball: {
+      x: pongState.ball.x,
+      y: pongState.ball.y,
+      vx: pongState.ball.vx,
+      vy: pongState.ball.vy
+    },
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+function drawPongWinnerOverlay(winnerName, leftScore, rightScore) {
+  if (!pongCtx || !pongCanvas) return;
+  const ctx = pongCtx;
+  ctx.fillStyle = 'rgba(0,0,0,0.52)';
+  ctx.fillRect(0,0,pongCanvas.width,pongCanvas.height);
+  ctx.fillStyle = '#fdf0f4';
+  ctx.textAlign = 'center';
+  ctx.font = '28px serif';
+  ctx.fillText(winnerName + ' wins! 🏆', pongCanvas.width/2, pongCanvas.height/2 - 5);
+  ctx.font = '16px sans-serif';
+  ctx.fillText(`${leftScore} - ${rightScore}`, pongCanvas.width/2, pongCanvas.height/2 + 28);
+}
+
+function savePongOnlineWinIfNeeded(data) {
+  if (pongOnlineMatchSaved || !data.winnerEmail || pongOnlineSide !== 'p1') return;
+  pongOnlineMatchSaved = true;
+  const leftScore = data.left?.score || 0;
+  const rightScore = data.right?.score || 0;
+  if (data.winnerEmail === currentUser.email) {
+    savePongWin(leftScore, rightScore);
+  } else {
+    // From Player 1's browser, save Player 2's win to their leaderboard record.
+    savePongPartnerWin(rightScore, leftScore);
+  }
+}
+
+
 document.addEventListener('keydown', e => { if(e.key==='Escape'){closeLightbox();closeSlideshow();closeCelebration();} });
 
 // ── GAMES: HUB + PONG BATTLE + FLAPPY LOVE + MINI CHAT ──
@@ -1627,6 +2016,7 @@ function backToGameLibrary() {
   document.getElementById('pong-game-view').classList.remove('active');
   document.getElementById('flappy-game-view').classList.remove('active');
   setGamePresence(false, 'Games Menu');
+  leavePongOnlineRoom(false);
   stopPongLoop();
   stopFlappyLoop();
   drawPongIdle();
@@ -1759,6 +2149,16 @@ let pongWinnerSaved = false;
 let pongKeys = { w:false, s:false, up:false, down:false };
 let pongState = null;
 
+// Online Pong uses Firestore room codes.
+// Player 1 / room creator is the host and controls the official ball physics.
+// Player 2 sends only their paddle position. This keeps both screens using the same score/ball.
+let pongOnlineRoomCode = null;
+let pongOnlineSide = null; // 'p1' or 'p2'
+let pongOnlineUnsub = null;
+let pongOnlineLastWrite = 0;
+let pongOnlineLastStateWrite = 0;
+let pongOnlineMatchSaved = false;
+
 function initPongCanvas() {
   pongCanvas = document.getElementById('pong-canvas');
   if (!pongCanvas) return false;
@@ -1768,11 +2168,15 @@ function initPongCanvas() {
 
 function setPongMode(mode) {
   if (pongRunning) return;
-  pongMode = mode === 'local' ? 'local' : 'ai';
+  pongMode = ['ai','local','online'].includes(mode) ? mode : 'ai';
   document.getElementById('pong-mode-ai')?.classList.toggle('active', pongMode === 'ai');
   document.getElementById('pong-mode-local')?.classList.toggle('active', pongMode === 'local');
+  document.getElementById('pong-mode-online')?.classList.toggle('active', pongMode === 'online');
+  document.getElementById('pong-online-panel')?.classList.toggle('show', pongMode === 'online');
   updatePongNames();
   drawPongIdle();
+  const status = document.getElementById('pong-status');
+  if (status && pongMode === 'online') status.textContent = 'Online 1v1: create a room or join using a room code. Creator starts the match.';
 }
 
 function updatePongNames() {
@@ -1780,7 +2184,12 @@ function updatePongNames() {
   const leftName = document.getElementById('pong-left-name');
   const rightName = document.getElementById('pong-right-name');
   if (leftName) leftName.textContent = currentUserName || 'Player 1';
-  if (rightName) rightName.textContent = pongMode === 'ai' ? 'AI' : partnerName;
+  if (rightName) {
+    if (pongMode === 'ai') rightName.textContent = 'AI';
+    else if (pongMode === 'online' && pongState?.rightName) rightName.textContent = pongState.rightName;
+    else rightName.textContent = partnerName;
+  }
+  if (leftName && pongMode === 'online' && pongState?.leftName) leftName.textContent = pongState.leftName;
 }
 
 function getPongTargetFromInput() {
@@ -1817,6 +2226,10 @@ function resetPongBall(direction) {
 
 function startPongGame() {
   if (!currentUser) return;
+  if (pongMode === 'online') {
+    startPongOnlineMatch();
+    return;
+  }
   pongScoreToWin = getPongTargetFromInput();
   pongWinnerSaved = false;
   pongState = createPongState();
@@ -1835,6 +2248,10 @@ function startPongGame() {
 }
 
 function pausePongGame() {
+  if (pongMode === 'online') {
+    document.getElementById('pong-status').textContent = 'Online pause is not added yet. Use Reset/Leave room instead.';
+    return;
+  }
   if (!pongState) return;
   pongRunning = !pongRunning;
   document.getElementById('pong-status').textContent = pongRunning ? 'Match resumed.' : 'Paused. Click Pause again to resume.';
@@ -1842,6 +2259,10 @@ function pausePongGame() {
 }
 
 function resetPongGame() {
+  if (pongMode === 'online' && pongOnlineRoomCode) {
+    resetPongOnlineRoom();
+    return;
+  }
   stopPongLoop();
   pongRunning = false;
   pongState = createPongState();
@@ -1973,6 +2394,22 @@ function drawPongFrame() {
 
 function pongLoop() {
   if (!pongRunning || !pongState) return;
+
+  if (pongMode === 'online') {
+    movePongOnlinePaddle();
+
+    if (pongOnlineSide === 'p1') {
+      updatePongBall();
+      writeHostOnlineState();
+    } else {
+      writeMyOnlinePaddle();
+    }
+
+    drawPongFrame();
+    if (pongRunning) pongLoopId = requestAnimationFrame(pongLoop);
+    return;
+  }
+
   movePongPaddles();
   updatePongBall();
   drawPongFrame();
@@ -1982,6 +2419,15 @@ function pongLoop() {
 function checkPongWinner() {
   const s = pongState;
   if (s.left.score < pongScoreToWin && s.right.score < pongScoreToWin) return false;
+
+  if (pongMode === 'online') {
+    pongRunning = false;
+    stopPongLoop();
+    const winnerSide = s.left.score > s.right.score ? 'p1' : 'p2';
+    if (pongOnlineSide === 'p1') endPongOnlineMatch(winnerSide);
+    return true;
+  }
+
   pongRunning = false;
   stopPongLoop();
   const input = document.getElementById('pong-score-to-win');
@@ -1990,15 +2436,7 @@ function checkPongWinner() {
   const winnerName = leftWon ? (currentUserName || 'Player 1') : (pongMode === 'ai' ? 'AI' : (ALLOWED_USERS[getPartnerEmail()] || 'Player 2'));
   document.getElementById('pong-status').textContent = `${winnerName} wins ${s.left.score}-${s.right.score}. Change score to win or start another match.`;
   drawPongFrame();
-  const ctx = pongCtx;
-  ctx.fillStyle = 'rgba(0,0,0,0.52)';
-  ctx.fillRect(0,0,pongCanvas.width,pongCanvas.height);
-  ctx.fillStyle = '#fdf0f4';
-  ctx.textAlign = 'center';
-  ctx.font = '28px serif';
-  ctx.fillText(winnerName + ' wins! 🏆', pongCanvas.width/2, pongCanvas.height/2 - 5);
-  ctx.font = '16px sans-serif';
-  ctx.fillText(`${s.left.score} - ${s.right.score}`, pongCanvas.width/2, pongCanvas.height/2 + 28);
+  drawPongWinnerOverlay(winnerName, s.left.score, s.right.score);
   if (leftWon && !pongWinnerSaved) savePongWin(s.left.score, s.right.score);
   if (!leftWon && pongMode === 'local' && !pongWinnerSaved) savePongPartnerWin(s.right.score, s.left.score);
   return true;
