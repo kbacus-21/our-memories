@@ -295,6 +295,17 @@
 
     /* ── GAMES ── */
     .games-layout{display:grid;grid-template-columns:1.25fr 0.75fr;gap:1rem;align-items:start;}
+    .games-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-bottom:1rem;}
+    .game-select-card{background:linear-gradient(135deg,rgba(232,99,122,0.08),rgba(240,200,160,0.04));border:1px solid var(--border);border-radius:18px;padding:1.3rem;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;min-height:170px;display:flex;flex-direction:column;justify-content:space-between;}
+    .game-select-card:hover{transform:translateY(-4px);border-color:var(--border-hover);background:var(--surface2);box-shadow:0 18px 42px rgba(0,0,0,0.35);}
+    .game-select-icon{font-size:3rem;margin-bottom:0.7rem;filter:drop-shadow(0 8px 18px rgba(0,0,0,0.35));}
+    .game-select-card h3{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400;color:var(--gold);margin-bottom:0.3rem;}
+    .game-select-card p{color:var(--text-dim);font-size:0.86rem;line-height:1.55;}
+    .game-select-footer{margin-top:0.9rem;color:var(--rose);font-size:0.82rem;}
+    .game-view{display:none;animation:fadeUp 0.25s ease;}
+    .game-view.active{display:block;}
+    .game-back-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-dim);font-size:0.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;margin-bottom:1rem;}
+    .game-back-btn:hover{border-color:var(--border-hover);color:var(--text);}
     .game-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.4rem;margin-bottom:1rem;box-shadow:0 14px 36px rgba(0,0,0,0.22);}
     .game-card h3{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400;color:var(--gold);margin-bottom:0.5rem;}
     .game-card p{color:var(--text-dim);font-size:0.9rem;line-height:1.6;}
@@ -305,13 +316,17 @@
     .word-chip{display:inline-flex;align-items:center;gap:0.4rem;background:rgba(240,200,160,0.08);border:1px solid var(--gold-dim);border-radius:999px;padding:0.35rem 0.65rem;color:var(--gold);font-size:0.82rem;}
     .word-chip button{background:none;border:none;color:var(--rose);cursor:pointer;font-size:0.85rem;line-height:1;}
     .scramble-display{font-family:'Cormorant Garamond',serif;font-size:2.5rem;letter-spacing:0.18em;text-align:center;color:var(--gold);padding:1.1rem;border:1px dashed var(--gold-dim);border-radius:14px;background:rgba(240,200,160,0.05);margin:1rem 0;word-break:break-all;}
+    .flappy-wrap{display:flex;flex-direction:column;align-items:center;gap:0.8rem;}
+    #flappy-canvas{width:100%;max-width:420px;height:520px;background:linear-gradient(180deg,rgba(232,99,122,0.16),rgba(30,10,50,0.82));border:1px solid var(--border-hover);border-radius:18px;box-shadow:0 16px 45px rgba(0,0,0,0.45);touch-action:manipulation;}
+    .flappy-help{text-align:center;color:var(--text-dim);font-size:0.85rem;}
     .game-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.7rem;margin-top:1rem;}
     .game-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:0.8rem;text-align:center;}
     .game-stat strong{display:block;color:var(--gold);font-size:1.1rem;}
     .game-stat span{font-size:0.75rem;color:var(--text-dim);}
     .score-list{display:flex;flex-direction:column;gap:0.55rem;margin-top:0.8rem;}
-    .score-row{display:flex;justify-content:space-between;gap:1rem;padding:0.7rem 0.85rem;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:0.9rem;}
+    .score-row{display:flex;justify-content:space-between;gap:1rem;padding:0.7rem 0.85rem;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:0.86rem;line-height:1.45;}
     .score-row.winner{border-color:var(--gold-dim);color:var(--gold);background:rgba(240,200,160,0.07);}
+    .score-row strong{color:var(--text);font-weight:500;}
     .game-presence-pill{display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--border);background:var(--surface);border-radius:50px;padding:0.35rem 0.75rem;color:var(--text-dim);font-size:0.82rem;}
     .mini-game-chat{position:fixed;right:1rem;bottom:1rem;width:280px;max-width:calc(100vw - 2rem);background:rgba(15,8,20,0.96);border:1px solid var(--border-hover);border-radius:18px;padding:0.8rem;z-index:550;box-shadow:0 14px 46px rgba(0,0,0,0.55);backdrop-filter:blur(18px);display:none;}
     .mini-game-chat.show{display:block;animation:fadeUp 0.2s ease;}
@@ -325,7 +340,7 @@
     .mini-chat-input-row input{flex:1;padding:0.55rem 0.75rem;border-radius:50px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);outline:none;font-family:'DM Sans',sans-serif;font-size:0.82rem;}
     .mini-chat-input-row button{padding:0.5rem 0.7rem;border-radius:50px;border:none;background:var(--rose);color:#fff;cursor:pointer;font-size:0.78rem;}
     .game-toast{position:fixed;right:1.5rem;bottom:6.2rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;padding:0.75rem 1.1rem;border-radius:50px;box-shadow:0 8px 24px rgba(232,99,122,0.45);z-index:5100;font-size:0.85rem;animation:toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;}
-    @media(max-width:800px){.games-layout{grid-template-columns:1fr;}.mini-game-chat{left:1rem;right:1rem;width:auto;}.scramble-display{font-size:2rem;}}
+    @media(max-width:800px){.games-layout{grid-template-columns:1fr;}.games-library{grid-template-columns:1fr;}.mini-game-chat{left:1rem;right:1rem;width:auto;}.scramble-display{font-size:2rem;}#flappy-canvas{height:460px;}}
 
 
     ::-webkit-scrollbar{width:3px;}
@@ -544,49 +559,125 @@
         <div class="game-presence-pill" id="game-presence-pill">🎮 Checking partner...</div>
       </div>
 
-      <div class="games-layout">
-        <div>
-          <div class="game-card">
-            <h3>Word Scramble 🔤</h3>
-            <p>Add your own words to the shared word bank, then race to unscramble them. The fastest average time steals the crown. No pressure... actually, full pressure. 😂</p>
-            <div class="scramble-display" id="scramble-display">READY</div>
-            <div class="game-row">
-              <input type="text" id="scramble-answer" placeholder="Type the correct word here" autocomplete="off"/>
-              <button class="btn-rose" onclick="startWordScramble()">Start Round</button>
-              <button class="btn-gold" onclick="submitWordScramble()">Submit</button>
+      <div id="games-library-view">
+        <div class="games-library">
+          <div class="game-select-card" onclick="openGame('word')">
+            <div>
+              <div class="game-select-icon">🔤</div>
+              <h3>Word Scramble</h3>
+              <p>Unscramble shared words from your own couple word bank. Fastest average time wins.</p>
             </div>
-            <p id="scramble-feedback" style="margin-top:0.8rem;color:var(--gold);"></p>
-            <div class="game-stat-grid">
-              <div class="game-stat"><strong id="timer-display">0.00s</strong><span>Your time</span></div>
-              <div class="game-stat"><strong id="my-average-display">--</strong><span>Your avg</span></div>
-              <div class="game-stat"><strong id="partner-average-display">--</strong><span>Partner avg</span></div>
-            </div>
+            <div class="game-select-footer">Play now →</div>
           </div>
-
-          <div class="game-card">
-            <h3>Shared Word Bank 💬</h3>
-            <p>Use places, nicknames, pet names, funny words, and inside jokes. Keep it wholesome-ish. 😌</p>
-            <div class="game-row">
-              <input type="text" id="word-bank-input" placeholder="Example: Butong, baby, mango, date night" autocomplete="off"/>
-              <button class="btn-rose" onclick="addWordBankWord()">Add Word</button>
+          <div class="game-select-card" onclick="openGame('flappy')">
+            <div>
+              <div class="game-select-icon">🐦</div>
+              <h3>Flappy Love</h3>
+              <p>Tap to fly through the heart gates. Highest score takes the crown for this game.</p>
             </div>
-            <div id="word-bank-list" class="word-bank-list"></div>
+            <div class="game-select-footer">Play now →</div>
           </div>
         </div>
 
-        <div>
+        <div class="games-layout">
           <div class="game-card">
-            <h3>Leaderboard 👑</h3>
-            <p id="leaderboard-summary">Play a round to start the battle.</p>
-            <div id="game-score-list" class="score-list"></div>
+            <h3>🏆 Combined Leaderboard</h3>
+            <p id="overall-leaderboard-summary">Play games to start the championship.</p>
+            <div id="combined-leaderboard-list" class="score-list"></div>
+          </div>
+          <div class="game-card">
+            <h3>Winners Per Game 👑</h3>
+            <div id="per-game-winners" class="score-list"></div>
+            <div class="game-row">
+              <button class="btn-gold" onclick="toggleMiniGameChat(true)">Open Mini Chat 💬</button>
+              <button class="btn-rose" onclick="pokePartner()">Poke Partner 💕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="word-game-view" class="game-view">
+        <button class="game-back-btn" onclick="backToGameLibrary()">← Back to Games</button>
+        <div class="games-layout">
+          <div>
+            <div class="game-card">
+              <h3>Word Scramble 🔤</h3>
+              <p>Add your own words to the shared word bank, then race to unscramble them. The fastest average time steals the crown.</p>
+              <div class="scramble-display" id="scramble-display">READY</div>
+              <div class="game-row">
+                <input type="text" id="scramble-answer" placeholder="Type the correct word here" autocomplete="off"/>
+                <button class="btn-rose" onclick="startWordScramble()">Start Round</button>
+                <button class="btn-gold" onclick="submitWordScramble()">Submit</button>
+              </div>
+              <p id="scramble-feedback" style="margin-top:0.8rem;color:var(--gold);"></p>
+              <div class="game-stat-grid">
+                <div class="game-stat"><strong id="timer-display">0.00s</strong><span>Your time</span></div>
+                <div class="game-stat"><strong id="my-average-display">--</strong><span>Your avg</span></div>
+                <div class="game-stat"><strong id="partner-average-display">--</strong><span>Partner avg</span></div>
+              </div>
+            </div>
+
+            <div class="game-card">
+              <h3>Shared Word Bank 💬</h3>
+              <p>Use places, nicknames, pet names, funny words, and inside jokes.</p>
+              <div class="game-row">
+                <input type="text" id="word-bank-input" placeholder="Example: Butong, baby, mango, date night" autocomplete="off"/>
+                <button class="btn-rose" onclick="addWordBankWord()">Add Word</button>
+              </div>
+              <div id="word-bank-list" class="word-bank-list"></div>
+            </div>
           </div>
 
+          <div>
+            <div class="game-card">
+              <h3>Word Scramble Leaderboard 👑</h3>
+              <p id="leaderboard-summary">Play a round to start the battle.</p>
+              <div id="game-score-list" class="score-list"></div>
+            </div>
+            <div class="game-card">
+              <h3>Game Actions 😂</h3>
+              <p>Distract each other a little. Love is war, but cute.</p>
+              <div class="game-row">
+                <button class="btn-rose" onclick="pokePartner()">Poke Partner 💕</button>
+                <button class="btn-gold" onclick="toggleMiniGameChat(true)">Open Mini Chat 💬</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="flappy-game-view" class="game-view">
+        <button class="game-back-btn" onclick="backToGameLibrary()">← Back to Games</button>
+        <div class="games-layout">
           <div class="game-card">
-            <h3>Game Actions 😂</h3>
-            <p>Distract each other a little. Love is war, but cute.</p>
-            <div class="game-row">
-              <button class="btn-rose" onclick="pokePartner()">Poke Partner 💕</button>
-              <button class="btn-gold" onclick="toggleMiniGameChat(true)">Open Mini Chat 💬</button>
+            <h3>Flappy Love 🐦</h3>
+            <p>Tap, click, or press Space to fly. Pass the heart gates. Don’t crash, boss.</p>
+            <div class="flappy-wrap">
+              <canvas id="flappy-canvas" width="420" height="520"></canvas>
+              <div class="flappy-help" id="flappy-status">Press Start, then tap/click/Space to flap.</div>
+              <div class="game-row" style="justify-content:center;">
+                <button class="btn-rose" onclick="startFlappyLove()">Start Flappy Love</button>
+                <button class="btn-gold" onclick="flappyFlap()">Flap 💕</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="game-card">
+              <h3>Flappy Leaderboard 👑</h3>
+              <div class="game-stat-grid">
+                <div class="game-stat"><strong id="flappy-current-score">0</strong><span>Current score</span></div>
+                <div class="game-stat"><strong id="my-flappy-best">--</strong><span>Your best</span></div>
+                <div class="game-stat"><strong id="partner-flappy-best">--</strong><span>Partner best</span></div>
+              </div>
+              <div id="flappy-score-list" class="score-list"></div>
+            </div>
+            <div class="game-card">
+              <h3>Game Actions 😂</h3>
+              <p>Mini chat stays floating while you play.</p>
+              <div class="game-row">
+                <button class="btn-rose" onclick="pokePartner()">Poke Partner 💕</button>
+                <button class="btn-gold" onclick="toggleMiniGameChat(true)">Open Mini Chat 💬</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1474,7 +1565,10 @@ function escAttr(str){return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&
 
 document.addEventListener('keydown', e => { if(e.key==='Escape'){closeLightbox();closeSlideshow();closeCelebration();} });
 
-// ── GAMES: WORD SCRAMBLE + MINI CHAT ──
+// ── GAMES: HUB + WORD SCRAMBLE + FLAPPY LOVE + MINI CHAT ──
+let flappyCanvas = null, flappyCtx = null, flappyRunning = false, flappyLoopId = null;
+let flappyBird = null, flappyPipes = [], flappyScore = 0, flappyFrame = 0, flappySavedThisRound = false;
+
 function getPartnerEmail() {
   if (!currentUser) return null;
   return Object.keys(ALLOWED_USERS).find(e => e !== currentUser.email.toLowerCase());
@@ -1486,6 +1580,7 @@ function loadGames() {
   watchGameChat();
   watchGamePresence();
   watchGameActivities();
+  drawFlappyIdle();
 }
 
 function cleanupGames() {
@@ -1494,6 +1589,26 @@ function cleanupGames() {
   });
   wordBankUnsubscribe = gameScoresUnsubscribe = gameChatUnsubscribe = gamePresenceUnsubscribe = gameActivityUnsubscribe = null;
   if (currentScrambleTimer) clearInterval(currentScrambleTimer);
+  stopFlappyLoop();
+}
+
+function openGame(game) {
+  document.getElementById('games-library-view').style.display = 'none';
+  document.getElementById('word-game-view').classList.toggle('active', game === 'word');
+  document.getElementById('flappy-game-view').classList.toggle('active', game === 'flappy');
+  toggleMiniGameChat(true);
+  setGamePresence(true, game === 'word' ? 'Word Scramble' : 'Flappy Love');
+  notifyPartnerActivity(currentUserName + ' just opened ' + (game === 'word' ? 'Word Scramble 🔤' : 'Flappy Love 🐦'));
+  if (game === 'flappy') setTimeout(drawFlappyIdle, 60);
+}
+
+function backToGameLibrary() {
+  document.getElementById('games-library-view').style.display = 'block';
+  document.getElementById('word-game-view').classList.remove('active');
+  document.getElementById('flappy-game-view').classList.remove('active');
+  setGamePresence(false, 'Games Menu');
+  stopFlappyLoop();
+  drawFlappyIdle();
 }
 
 function loadWordBank() {
@@ -1521,6 +1636,7 @@ function renderWordBank() {
 
 function addWordBankWord() {
   const input = document.getElementById('word-bank-input');
+  if (!input) return;
   const raw = input.value.trim();
   if (!raw || !currentUser) return;
   const words = raw.split(',').map(w => w.trim()).filter(Boolean).slice(0, 12);
@@ -1569,7 +1685,7 @@ function startWordScramble() {
   document.getElementById('scramble-answer').value = '';
   document.getElementById('scramble-answer').focus();
   document.getElementById('scramble-feedback').textContent = 'Timer started. Go go go! 🏃';
-  setGamePresence(true);
+  setGamePresence(true, 'Word Scramble');
   notifyPartnerActivity(currentUserName + ' just started playing Word Scramble! 🎮');
   if (currentScrambleTimer) clearInterval(currentScrambleTimer);
   currentScrambleTimer = setInterval(() => {
@@ -1612,14 +1728,148 @@ function submitWordScramble() {
   });
 }
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    const active = document.activeElement;
-    if (active && active.id === 'scramble-answer') submitWordScramble();
-    if (active && active.id === 'word-bank-input') addWordBankWord();
-    if (active && active.id === 'mini-chat-input') sendGameChatMessage();
+function initFlappyCanvas() {
+  flappyCanvas = document.getElementById('flappy-canvas');
+  if (!flappyCanvas) return false;
+  flappyCtx = flappyCanvas.getContext('2d');
+  return true;
+}
+
+function drawFlappyIdle() {
+  if (!initFlappyCanvas()) return;
+  const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
+  ctx.clearRect(0,0,w,h);
+  drawFlappyBackground();
+  ctx.fillStyle = 'rgba(253,240,244,0.85)';
+  ctx.textAlign = 'center';
+  ctx.font = '30px serif';
+  ctx.fillText('💕', w/2, h/2 - 35);
+  ctx.font = '22px serif';
+  ctx.fillText('Flappy Love', w/2, h/2 + 5);
+  ctx.font = '14px sans-serif';
+  ctx.fillText('Press Start to play', w/2, h/2 + 34);
+}
+
+function startFlappyLove() {
+  if (!currentUser || !initFlappyCanvas()) return;
+  stopFlappyLoop();
+  flappyRunning = true;
+  flappySavedThisRound = false;
+  flappyScore = 0;
+  flappyFrame = 0;
+  flappyBird = { x: 95, y: 230, r: 15, v: 0 };
+  flappyPipes = [];
+  document.getElementById('flappy-current-score').textContent = '0';
+  document.getElementById('flappy-status').textContent = 'Tap/click/Space to flap. Don’t hit the heart gates.';
+  setGamePresence(true, 'Flappy Love');
+  notifyPartnerActivity(currentUserName + ' just started playing Flappy Love! 🐦');
+  flappyLoop();
+}
+
+function stopFlappyLoop() {
+  flappyRunning = false;
+  if (flappyLoopId) cancelAnimationFrame(flappyLoopId);
+  flappyLoopId = null;
+}
+
+function flappyFlap() {
+  if (!flappyRunning) return;
+  flappyBird.v = -7.5;
+}
+
+function drawFlappyBackground() {
+  const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'rgba(232,99,122,0.22)');
+  grad.addColorStop(1,'rgba(30,10,50,0.88)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = 'rgba(240,200,160,0.14)';
+  for (let i=0;i<18;i++) ctx.fillText('✨', (i*71 + flappyFrame*0.2)%w, 50 + (i*37)%360);
+}
+
+function spawnFlappyPipe() {
+  const gap = 145;
+  const top = 70 + Math.random() * 230;
+  flappyPipes.push({ x: flappyCanvas.width + 20, top, bottom: top + gap, passed: false });
+}
+
+function flappyLoop() {
+  if (!flappyRunning) return;
+  const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
+  flappyFrame++;
+  if (flappyFrame % 92 === 1) spawnFlappyPipe();
+  flappyBird.v += 0.42;
+  flappyBird.y += flappyBird.v;
+  flappyPipes.forEach(p => p.x -= 2.8);
+  flappyPipes = flappyPipes.filter(p => p.x > -70);
+
+  drawFlappyBackground();
+  ctx.fillStyle = 'rgba(232,99,122,0.78)';
+  flappyPipes.forEach(p => {
+    ctx.fillRect(p.x, 0, 54, p.top);
+    ctx.fillRect(p.x, p.bottom, 54, h-p.bottom);
+    ctx.font = '24px serif';
+    ctx.fillText('💗', p.x + 13, p.top - 8);
+    ctx.fillText('💗', p.x + 13, p.bottom + 28);
+    if (!p.passed && p.x + 54 < flappyBird.x) {
+      p.passed = true;
+      flappyScore++;
+      document.getElementById('flappy-current-score').textContent = flappyScore;
+    }
+  });
+
+  ctx.font = '30px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🐦', flappyBird.x, flappyBird.y + 10);
+  ctx.fillStyle = 'rgba(253,240,244,0.9)';
+  ctx.font = '22px sans-serif';
+  ctx.fillText(flappyScore, w/2, 38);
+
+  const hitWall = flappyBird.y - flappyBird.r < 0 || flappyBird.y + flappyBird.r > h;
+  const hitPipe = flappyPipes.some(p => flappyBird.x + flappyBird.r > p.x && flappyBird.x - flappyBird.r < p.x + 54 && (flappyBird.y - flappyBird.r < p.top || flappyBird.y + flappyBird.r > p.bottom));
+  if (hitWall || hitPipe) return endFlappyLove();
+  flappyLoopId = requestAnimationFrame(flappyLoop);
+}
+
+function endFlappyLove() {
+  stopFlappyLoop();
+  document.getElementById('flappy-status').textContent = `Game over. Score: ${flappyScore}. Press Start to try again.`;
+  if (!flappySavedThisRound) {
+    flappySavedThisRound = true;
+    saveFlappyScore(flappyScore);
   }
-});
+  const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = '#fdf0f4';
+  ctx.textAlign = 'center';
+  ctx.font = '26px serif';
+  ctx.fillText('Game Over 💔', w/2, h/2 - 10);
+  ctx.font = '17px sans-serif';
+  ctx.fillText('Score: ' + flappyScore, w/2, h/2 + 25);
+}
+
+function saveFlappyScore(score) {
+  if (!currentUser) return;
+  const scoreRef = db.collection('gameScores').doc(currentUser.email);
+  db.runTransaction(tx => tx.get(scoreRef).then(doc => {
+    const d = doc.exists ? doc.data() : {};
+    const played = (d.flappyGamesPlayed || 0) + 1;
+    const best = Math.max(d.flappyBestScore || 0, score);
+    const total = (d.flappyTotalScore || 0) + score;
+    tx.set(scoreRef, {
+      name: currentUserName,
+      email: currentUser.email,
+      flappyGamesPlayed: played,
+      flappyBestScore: best,
+      flappyTotalScore: total,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  })).then(() => {
+    notifyPartnerActivity(currentUserName + ' scored ' + score + ' in Flappy Love 🐦');
+  });
+}
 
 function watchGameScores() {
   if (gameScoresUnsubscribe) gameScoresUnsubscribe();
@@ -1630,38 +1880,118 @@ function watchGameScores() {
   });
 }
 
+function getGameWinners() {
+  const players = Object.values(gameScores || {});
+  const wordPlayers = players.filter(p => p.wordScrambleAttempts > 0 && p.wordScrambleAvgMs).sort((a,b) => a.wordScrambleAvgMs - b.wordScrambleAvgMs);
+  const flappyPlayers = players.filter(p => p.flappyGamesPlayed > 0).sort((a,b) => (b.flappyBestScore || 0) - (a.flappyBestScore || 0));
+  return { word: wordPlayers[0] || null, flappy: flappyPlayers[0] || null };
+}
+
+function getPlayerTotals(email) {
+  const p = gameScores[email] || {};
+  const winners = getGameWinners();
+  let totalWins = 0;
+  if (winners.word && winners.word.email === email) totalWins++;
+  if (winners.flappy && winners.flappy.email === email) totalWins++;
+  return {
+    totalWins,
+    gamesPlayed: (p.wordScrambleAttempts || 0) + (p.flappyGamesPlayed || 0),
+    wordAvg: p.wordScrambleAvgMs || null,
+    wordBest: p.wordScrambleBestMs || null,
+    flappyBest: p.flappyBestScore || 0,
+    name: p.name || (ALLOWED_USERS[email] || 'Player'),
+    email
+  };
+}
+
 function renderGameScores() {
+  renderWordLeaderboard();
+  renderFlappyLeaderboard();
+  renderCombinedLeaderboard();
+}
+
+function renderWordLeaderboard() {
   const list = document.getElementById('game-score-list');
   const summary = document.getElementById('leaderboard-summary');
-  const navCrown = document.getElementById('nav-game-crown');
-  const crownTitle = document.getElementById('overall-winner-crown');
   const myAvg = document.getElementById('my-average-display');
   const partnerAvg = document.getElementById('partner-average-display');
-  if (!list) return;
-
-  const players = Object.values(gameScores).filter(p => p.wordScrambleAttempts > 0).sort((a,b) => (a.wordScrambleAvgMs || 999999999) - (b.wordScrambleAvgMs || 999999999));
+  const players = Object.values(gameScores).filter(p => p.wordScrambleAttempts > 0 && p.wordScrambleAvgMs).sort((a,b) => a.wordScrambleAvgMs - b.wordScrambleAvgMs);
   const me = currentUser ? gameScores[currentUser.email] : null;
   const partner = currentUser ? gameScores[getPartnerEmail()] : null;
   if (myAvg) myAvg.textContent = me && me.wordScrambleAvgMs ? (me.wordScrambleAvgMs / 1000).toFixed(2) + 's' : '--';
   if (partnerAvg) partnerAvg.textContent = partner && partner.wordScrambleAvgMs ? (partner.wordScrambleAvgMs / 1000).toFixed(2) + 's' : '--';
-
+  if (!list) return;
   if (!players.length) {
-    list.innerHTML = '<div class="score-row">No scores yet <span>---</span></div>';
+    list.innerHTML = '<div class="score-row">No Word Scramble scores yet <span>---</span></div>';
     if (summary) summary.textContent = 'Play a round to start the battle.';
+    return;
+  }
+  const winner = players[0];
+  if (summary) summary.textContent = `${winner.name} leads Word Scramble with ${(winner.wordScrambleAvgMs / 1000).toFixed(2)}s average.`;
+  list.innerHTML = players.map((p, idx) => `
+    <div class="score-row ${idx === 0 ? 'winner' : ''}">
+      <span>${idx === 0 ? '👑 ' : ''}<strong>${escHtml(p.name || 'Player')}</strong></span>
+      <span>Avg ${(p.wordScrambleAvgMs / 1000).toFixed(2)}s · Best ${(p.wordScrambleBestMs / 1000).toFixed(2)}s · Played ${p.wordScrambleAttempts}</span>
+    </div>
+  `).join('');
+}
+
+function renderFlappyLeaderboard() {
+  const list = document.getElementById('flappy-score-list');
+  const myBest = document.getElementById('my-flappy-best');
+  const partnerBest = document.getElementById('partner-flappy-best');
+  const me = currentUser ? gameScores[currentUser.email] : null;
+  const partner = currentUser ? gameScores[getPartnerEmail()] : null;
+  if (myBest) myBest.textContent = me && me.flappyGamesPlayed ? String(me.flappyBestScore || 0) : '--';
+  if (partnerBest) partnerBest.textContent = partner && partner.flappyGamesPlayed ? String(partner.flappyBestScore || 0) : '--';
+  if (!list) return;
+  const players = Object.values(gameScores).filter(p => p.flappyGamesPlayed > 0).sort((a,b) => (b.flappyBestScore || 0) - (a.flappyBestScore || 0));
+  if (!players.length) {
+    list.innerHTML = '<div class="score-row">No Flappy Love scores yet <span>---</span></div>';
+    return;
+  }
+  list.innerHTML = players.map((p, idx) => `
+    <div class="score-row ${idx === 0 ? 'winner' : ''}">
+      <span>${idx === 0 ? '👑 ' : ''}<strong>${escHtml(p.name || 'Player')}</strong></span>
+      <span>Best ${p.flappyBestScore || 0} · Played ${p.flappyGamesPlayed || 0}</span>
+    </div>
+  `).join('');
+}
+
+function renderCombinedLeaderboard() {
+  const combined = document.getElementById('combined-leaderboard-list');
+  const perGame = document.getElementById('per-game-winners');
+  const summary = document.getElementById('overall-leaderboard-summary');
+  const navCrown = document.getElementById('nav-game-crown');
+  const crownTitle = document.getElementById('overall-winner-crown');
+  const emails = Array.from(new Set([...Object.keys(ALLOWED_USERS), ...Object.keys(gameScores)]));
+  const totals = emails.map(getPlayerTotals).filter(p => p.gamesPlayed > 0).sort((a,b) => (b.totalWins - a.totalWins) || (b.gamesPlayed - a.gamesPlayed) || (b.flappyBest - a.flappyBest));
+  const winners = getGameWinners();
+
+  if (perGame) {
+    perGame.innerHTML = `
+      <div class="score-row ${winners.word ? 'winner' : ''}"><span>🔤 Word Scramble</span><span>${winners.word ? '👑 ' + escHtml(winners.word.name || 'Player') + ' · Avg ' + (winners.word.wordScrambleAvgMs/1000).toFixed(2) + 's' : 'No winner yet'}</span></div>
+      <div class="score-row ${winners.flappy ? 'winner' : ''}"><span>🐦 Flappy Love</span><span>${winners.flappy ? '👑 ' + escHtml(winners.flappy.name || 'Player') + ' · Best ' + (winners.flappy.flappyBestScore || 0) : 'No winner yet'}</span></div>
+    `;
+  }
+
+  if (!combined) return;
+  if (!totals.length) {
+    combined.innerHTML = '<div class="score-row">No games played yet <span>---</span></div>';
+    if (summary) summary.textContent = 'Play games to start the championship.';
     if (navCrown) navCrown.textContent = '';
     if (crownTitle) crownTitle.textContent = '';
     return;
   }
+  const champ = totals[0];
+  if (summary) summary.textContent = `${champ.name} is the overall champion with ${champ.totalWins} game crown${champ.totalWins === 1 ? '' : 's'}.`;
+  if (navCrown) navCrown.textContent = champ.email === (currentUser && currentUser.email) ? '👑' : '';
+  if (crownTitle) crownTitle.textContent = `👑 ${champ.name}`;
 
-  const winner = players[0];
-  if (summary) summary.textContent = `${winner.name} is currently winning with an average of ${(winner.wordScrambleAvgMs / 1000).toFixed(2)}s.`;
-  if (navCrown) navCrown.textContent = winner.email === (currentUser && currentUser.email) ? '👑' : '';
-  if (crownTitle) crownTitle.textContent = `👑 ${winner.name}`;
-
-  list.innerHTML = players.map((p, idx) => `
+  combined.innerHTML = totals.map((p, idx) => `
     <div class="score-row ${idx === 0 ? 'winner' : ''}">
-      <span>${idx === 0 ? '👑 ' : ''}${escHtml(p.name || 'Player')}</span>
-      <span>Avg ${(p.wordScrambleAvgMs / 1000).toFixed(2)}s · Best ${(p.wordScrambleBestMs / 1000).toFixed(2)}s · ${p.wordScrambleAttempts}x</span>
+      <span>${idx === 0 ? '👑 ' : ''}<strong>${escHtml(p.name)}</strong><br><span style="font-size:0.74rem;color:var(--text-dimmer);">Games played: ${p.gamesPlayed}</span></span>
+      <span>Total wins: ${p.totalWins}<br><span style="font-size:0.74rem;color:var(--text-dimmer);">Word: ${p.wordAvg ? (p.wordAvg/1000).toFixed(2)+'s avg' : '--'} · Flappy: ${p.flappyBest || '--'}</span></span>
     </div>
   `).join('');
 }
@@ -1701,12 +2031,13 @@ function sendGameChatMessage() {
   });
 }
 
-function setGamePresence(isPlaying) {
+function setGamePresence(isPlaying, gameName) {
   if (!currentUser) return;
   db.collection('gamePresence').doc(currentUser.email).set({
     name: currentUserName,
     email: currentUser.email,
     isPlaying: !!isPlaying,
+    currentGame: gameName || '',
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true }).catch(() => {});
 }
@@ -1723,7 +2054,7 @@ function watchGamePresence() {
       const d = doc.data();
       const updated = d.updatedAt ? d.updatedAt.toDate() : null;
       const fresh = updated && (Date.now() - updated.getTime()) < 2 * 60 * 1000;
-      if (d.isPlaying && fresh) status = `${d.name || 'Partner'} is currently playing 🎮`;
+      if (d.isPlaying && fresh) status = `${d.name || 'Partner'} is playing ${d.currentGame || 'a game'} 🎮`;
     }
     if (pill) pill.textContent = status;
     if (mini) mini.textContent = status;
@@ -1778,6 +2109,27 @@ function showGameToast(message) {
   document.body.appendChild(toast);
   setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
 }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const active = document.activeElement;
+    if (active && active.id === 'scramble-answer') submitWordScramble();
+    if (active && active.id === 'word-bank-input') addWordBankWord();
+    if (active && active.id === 'mini-chat-input') sendGameChatMessage();
+  }
+  if ((e.code === 'Space' || e.key === ' ') && document.getElementById('flappy-game-view') && document.getElementById('flappy-game-view').classList.contains('active')) {
+    e.preventDefault();
+    flappyFlap();
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.id === 'flappy-canvas') flappyFlap();
+});
+
+document.addEventListener('touchstart', function(e) {
+  if (e.target && e.target.id === 'flappy-canvas') { e.preventDefault(); flappyFlap(); }
+}, { passive:false });
 
 </script>
 </body>
