@@ -2742,7 +2742,17 @@ function savePongPartnerWin(scoreFor, scoreAgainst) {
   })).then(() => notifyPartnerActivity(partnerName + ' won Pong Battle ' + scoreFor + '-' + scoreAgainst + ' 🏓'));
 }
 
+
+function isTypingField(el){
+  return el && (
+    el.tagName === 'INPUT' ||
+    el.tagName === 'TEXTAREA' ||
+    el.isContentEditable
+  );
+}
+
 document.addEventListener('keydown', e => {
+  if (isTypingField(e.target)) return;
   const key = e.key.toLowerCase();
   if (['w','s','arrowup','arrowdown',' '].includes(key)) e.preventDefault();
   if (key === 'w') pongKeys.w = true;
@@ -2751,6 +2761,7 @@ document.addEventListener('keydown', e => {
   if (key === 'arrowdown') pongKeys.down = true;
 });
 document.addEventListener('keyup', e => {
+  if (isTypingField(e.target)) return;
   const key = e.key.toLowerCase();
   if (key === 'w') pongKeys.w = false;
   if (key === 's') pongKeys.s = false;
@@ -3284,7 +3295,7 @@ document.addEventListener('keydown', function(e) {
     if (active && active.id === 'word-bank-input') addWordBankWord();
     if (active && active.id === 'mini-chat-input') sendGameChatMessage();
   }
-  if ((e.code === 'Space' || e.key === ' ') && document.getElementById('flappy-game-view') && document.getElementById('flappy-game-view').classList.contains('active')) {
+  if (!isTypingField(e.target) && (e.code === 'Space' || e.key === ' ') && document.getElementById('flappy-game-view') && document.getElementById('flappy-game-view').classList.contains('active')) {
     e.preventDefault();
     flappyFlap();
   }
