@@ -2523,7 +2523,15 @@ function startFlappyLove() {
   flappySavedThisRound = false;
   flappyScore = 0;
   flappyFrame = 0;
-  flappyBird = { x: 95, y: 230, r: 15, v: 0 };
+  flappyBird = {
+    x: 95,
+    y: 230,
+    r: 17,
+    v: 0,
+    rotation: 0,
+    flapBoost: 0,
+    wingPhase: 0
+  };
   flappyPipes = [];
   document.getElementById('flappy-current-score').textContent = '0';
   document.getElementById('flappy-status').textContent = 'Tap/click/Space to flap. Don’t hit the heart gates.';
@@ -2539,8 +2547,10 @@ function stopFlappyLoop() {
 }
 
 function flappyFlap() {
-  if (!flappyRunning) return;
-  flappyBird.v = -7.5;
+  if (!flappyRunning || !flappyBird) return;
+  flappyBird.v = -7.9;
+  flappyBird.flapBoost = 10;
+  flappyBird.wingPhase = 0;
 }
 
 function drawFlappyBackground() {
@@ -2551,13 +2561,138 @@ function drawFlappyBackground() {
   ctx.fillStyle = grad;
   ctx.fillRect(0,0,w,h);
   ctx.fillStyle = 'rgba(240,200,160,0.14)';
+  ctx.font = '20px serif';
   for (let i=0;i<18;i++) ctx.fillText('✨', (i*71 + flappyFrame*0.2)%w, 50 + (i*37)%360);
 }
 
 function spawnFlappyPipe() {
-  const gap = 145;
+  const gap = 148;
   const top = 70 + Math.random() * 230;
   flappyPipes.push({ x: flappyCanvas.width + 20, top, bottom: top + gap, passed: false });
+}
+
+function drawHeartGate(p, h) {
+  const ctx = flappyCtx;
+  const pipeW = 54;
+  const capH = 14;
+  const grad = ctx.createLinearGradient(p.x, 0, p.x + pipeW, 0);
+  grad.addColorStop(0, 'rgba(192,64,96,0.95)');
+  grad.addColorStop(0.5, 'rgba(232,99,122,0.98)');
+  grad.addColorStop(1, 'rgba(150,45,82,0.95)');
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(p.x, 0, pipeW, p.top);
+  ctx.fillRect(p.x, p.bottom, pipeW, h - p.bottom);
+
+  ctx.fillStyle = 'rgba(255,180,200,0.95)';
+  ctx.fillRect(p.x - 5, p.top - capH, pipeW + 10, capH);
+  ctx.fillRect(p.x - 5, p.bottom, pipeW + 10, capH);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillRect(p.x + 10, 0, 8, p.top);
+  ctx.fillRect(p.x + 10, p.bottom, 8, h - p.bottom);
+
+  ctx.font = '24px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('💗', p.x + pipeW/2, p.top - 20);
+  ctx.fillText('💗', p.x + pipeW/2, p.bottom + 34);
+}
+
+function drawAnimatedFlappyBird() {
+  const ctx = flappyCtx;
+  const b = flappyBird;
+  const wingBeat = Math.sin(flappyFrame * 0.45) * 9 + (b.flapBoost || 0);
+  const tilt = Math.max(-0.55, Math.min(0.85, b.v * 0.075));
+  b.rotation += (tilt - b.rotation) * 0.25;
+  b.flapBoost = Math.max(0, (b.flapBoost || 0) - 0.8);
+
+  ctx.save();
+  ctx.translate(b.x, b.y);
+  ctx.rotate(b.rotation);
+
+  // soft shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(1, 19, 20, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // back wing, animated
+  ctx.fillStyle = '#f0c8a0';
+  ctx.strokeStyle = 'rgba(120,55,80,0.45)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(-10, 2 + wingBeat * 0.18, 12, 7 + Math.abs(wingBeat) * 0.12, -0.55, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // body
+  const bodyGrad = ctx.createLinearGradient(-20,-14,18,18);
+  bodyGrad.addColorStop(0, '#ffd1dc');
+  bodyGrad.addColorStop(0.5, '#ff7f9f');
+  bodyGrad.addColorStop(1, '#e04372');
+  ctx.fillStyle = bodyGrad;
+  ctx.strokeStyle = 'rgba(120,35,65,0.55)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 18, 15, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // belly highlight
+  ctx.fillStyle = 'rgba(255,240,244,0.55)';
+  ctx.beginPath();
+  ctx.ellipse(4, 5, 8, 6, -0.25, 0, Math.PI * 2);
+  ctx.fill();
+
+  // front wing, animated up/down
+  ctx.fillStyle = '#f6b1c2';
+  ctx.strokeStyle = 'rgba(120,55,80,0.45)';
+  ctx.beginPath();
+  ctx.ellipse(-5, 4 - wingBeat * 0.28, 13, 7, -0.35, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // tail feathers
+  ctx.fillStyle = '#f0c8a0';
+  ctx.beginPath();
+  ctx.moveTo(-17, -2);
+  ctx.lineTo(-29, -10);
+  ctx.lineTo(-25, 0);
+  ctx.lineTo(-30, 9);
+  ctx.lineTo(-16, 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,55,80,0.35)';
+  ctx.stroke();
+
+  // beak
+  ctx.fillStyle = '#ffd166';
+  ctx.strokeStyle = 'rgba(120,70,20,0.35)';
+  ctx.beginPath();
+  ctx.moveTo(17, -2);
+  ctx.lineTo(31, 3);
+  ctx.lineTo(17, 8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // eye
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(9, -7, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#1a0e22';
+  ctx.beginPath();
+  ctx.arc(11, -6, 2.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // cute blush
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.beginPath();
+  ctx.arc(8, 6, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
 }
 
 function flappyLoop() {
@@ -2565,19 +2700,18 @@ function flappyLoop() {
   const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
   flappyFrame++;
   if (flappyFrame % 92 === 1) spawnFlappyPipe();
-  flappyBird.v += 0.42;
+
+  flappyBird.v += 0.43;
+  flappyBird.v = Math.min(flappyBird.v, 9.5);
   flappyBird.y += flappyBird.v;
-  flappyPipes.forEach(p => p.x -= 2.8);
-  flappyPipes = flappyPipes.filter(p => p.x > -70);
+
+  flappyPipes.forEach(p => p.x -= 2.85);
+  flappyPipes = flappyPipes.filter(p => p.x > -75);
 
   drawFlappyBackground();
-  ctx.fillStyle = 'rgba(232,99,122,0.78)';
+
   flappyPipes.forEach(p => {
-    ctx.fillRect(p.x, 0, 54, p.top);
-    ctx.fillRect(p.x, p.bottom, 54, h-p.bottom);
-    ctx.font = '24px serif';
-    ctx.fillText('💗', p.x + 13, p.top - 8);
-    ctx.fillText('💗', p.x + 13, p.bottom + 28);
+    drawHeartGate(p, h);
     if (!p.passed && p.x + 54 < flappyBird.x) {
       p.passed = true;
       flappyScore++;
@@ -2585,15 +2719,22 @@ function flappyLoop() {
     }
   });
 
-  ctx.font = '30px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('🐦', flappyBird.x, flappyBird.y + 10);
+  drawAnimatedFlappyBird();
+
   ctx.fillStyle = 'rgba(253,240,244,0.9)';
+  ctx.textAlign = 'center';
   ctx.font = '22px sans-serif';
   ctx.fillText(flappyScore, w/2, 38);
 
   const hitWall = flappyBird.y - flappyBird.r < 0 || flappyBird.y + flappyBird.r > h;
-  const hitPipe = flappyPipes.some(p => flappyBird.x + flappyBird.r > p.x && flappyBird.x - flappyBird.r < p.x + 54 && (flappyBird.y - flappyBird.r < p.top || flappyBird.y + flappyBird.r > p.bottom));
+  const hitPipe = flappyPipes.some(p => {
+    const birdLeft = flappyBird.x - flappyBird.r + 3;
+    const birdRight = flappyBird.x + flappyBird.r - 3;
+    const birdTop = flappyBird.y - flappyBird.r + 3;
+    const birdBottom = flappyBird.y + flappyBird.r - 3;
+    return birdRight > p.x && birdLeft < p.x + 54 && (birdTop < p.top || birdBottom > p.bottom);
+  });
+
   if (hitWall || hitPipe) return endFlappyLove();
   flappyLoopId = requestAnimationFrame(flappyLoop);
 }
