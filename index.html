@@ -360,6 +360,45 @@
 
     ::-webkit-scrollbar{width:3px;}
     ::-webkit-scrollbar-thumb{background:rgba(232,99,122,0.4);border-radius:2px;}
+
+
+    /* ── INVITATIONS ── */
+    .invite-layout{display:grid;grid-template-columns:1fr 0.85fr;gap:1rem;align-items:start;}
+    .invite-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.4rem;margin-bottom:1rem;box-shadow:0 14px 36px rgba(0,0,0,0.22);}
+    .invite-card h3{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400;color:var(--gold);margin-bottom:0.5rem;}
+    .invite-card p{color:var(--text-dim);font-size:0.9rem;line-height:1.6;}
+    .invite-form{display:flex;flex-direction:column;gap:0.8rem;margin-top:1rem;}
+    .invite-form input,.invite-form textarea{padding:0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.95rem;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+    .invite-form textarea{min-height:100px;resize:vertical;}
+    .invite-form input:focus,.invite-form textarea:focus{border-color:var(--rose);}
+    .invite-list{display:flex;flex-direction:column;gap:0.75rem;margin-top:0.9rem;}
+    .invite-item{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:1rem;}
+    .invite-item.pending{border-color:rgba(240,200,160,0.35);}
+    .invite-item.answered{border-color:rgba(74,222,128,0.25);}
+    .invite-item-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:0.45rem;}
+    .invite-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);}
+    .invite-status{font-size:0.72rem;border:1px solid var(--border);border-radius:999px;padding:0.25rem 0.55rem;color:var(--text-dim);white-space:nowrap;}
+    .invite-status.pending{color:var(--gold);border-color:var(--gold-dim);}
+    .invite-status.yes{color:#86efac;border-color:rgba(74,222,128,0.4);}
+    .invite-meta{font-size:0.78rem;color:var(--text-dimmer);margin:0.2rem 0;}
+    .invite-answer{margin-top:0.65rem;padding:0.7rem;border-radius:12px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.18);color:var(--text-dim);font-size:0.86rem;line-height:1.5;}
+    .invite-actions{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;}
+    #invite-popup-overlay{display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:1rem;}
+    #invite-popup-overlay.open{display:flex;}
+    .invite-popup{position:relative;width:100%;max-width:470px;background:rgba(15,8,20,0.96);border:1px solid rgba(232,99,122,0.45);border-radius:24px;padding:2rem;box-shadow:0 30px 90px rgba(0,0,0,0.8),0 0 70px rgba(232,99,122,0.24);overflow:hidden;}
+    .invite-popup::before{content:'';position:absolute;inset:-80px;background:radial-gradient(circle at 20% 10%,rgba(232,99,122,0.22),transparent 35%),radial-gradient(circle at 80% 90%,rgba(240,200,160,0.14),transparent 35%);pointer-events:none;}
+    .invite-popup>*{position:relative;z-index:1;}
+    .invite-popup-emoji{text-align:center;font-size:3rem;margin-bottom:0.6rem;animation:heartBeat 1.2s ease-in-out infinite;}
+    .invite-popup h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--gold);text-align:center;margin-bottom:0.5rem;}
+    .invite-popup-message{color:var(--text-dim);text-align:center;line-height:1.65;margin-bottom:1rem;}
+    .invite-popup-plan{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:16px;padding:1rem;margin-bottom:1rem;}
+    .invite-popup-plan strong{display:block;color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.25rem;margin-bottom:0.3rem;}
+    .invite-response-box{display:flex;flex-direction:column;gap:0.65rem;}
+    .invite-response-box textarea{min-height:80px;resize:vertical;padding:0.75rem 0.9rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+    .invite-popup-actions{position:relative;min-height:54px;display:flex;gap:0.6rem;align-items:center;justify-content:center;flex-wrap:wrap;}
+    #invite-ignore-btn{transition:transform 0.16s ease;}
+    @media(max-width:800px){.invite-layout{grid-template-columns:1fr;}.invite-popup{padding:1.5rem;}}
+
   </style>
 </head>
 <body>
@@ -435,6 +474,30 @@
   </div>
 </div>
 
+
+
+<!-- INVITATION POPUP -->
+<div id="invite-popup-overlay">
+  <div class="invite-popup" id="invite-popup-card">
+    <div class="invite-popup-emoji">💌</div>
+    <h3 id="invite-popup-heading">You have an invitation</h3>
+    <div class="invite-popup-message" id="invite-popup-message"></div>
+    <div class="invite-popup-plan">
+      <strong id="invite-popup-title"></strong>
+      <div id="invite-popup-date" class="invite-meta"></div>
+      <p id="invite-popup-details"></p>
+    </div>
+    <div class="invite-response-box">
+      <textarea id="invite-answer-text" placeholder="Write your answer here... example: Yes, what time? 💕"></textarea>
+      <div class="invite-popup-actions" id="invite-popup-actions">
+        <button class="btn-rose" onclick="answerCurrentInvite('yes')">Yes 💕</button>
+        <button class="btn-gold" onclick="answerCurrentInvite('maybe')">Maybe / Need to talk</button>
+        <button class="btn-danger" id="invite-ignore-btn" onmouseenter="runawayIgnoreButton()" ontouchstart="runawayIgnoreButton()" onclick="runawayIgnoreButton(); return false;">Ignore 😭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="login-page">
   <div class="login-box">
@@ -464,6 +527,7 @@
       <button onclick="showSection('notes')" id="nav-notes">📝 Notes</button>
       <button onclick="showSection('timeline')" id="nav-timeline">🗓️ Timeline</button>
       <button onclick="showSection('messages')" id="nav-messages">💌 Messages</button>
+      <button onclick="showSection('invitations')" id="nav-invitations">💌 Invitations <span id="nav-invite-badge"></span></button>
       <button onclick="showSection('games')" id="nav-games">🎮 Games <span id="nav-game-crown"></span></button>
       <button id="logout-btn">Logout</button>
     </div>
@@ -566,6 +630,42 @@
       </div>
     </section>
 
+
+
+    <!-- INVITATIONS -->
+    <section id="invitations" class="section">
+      <div class="section-header">
+        <h2>Invitations 💌</h2>
+        <button class="btn-gold" onclick="openPendingInvitePopup()">Check Pending Invite</button>
+      </div>
+      <div class="invite-layout">
+        <div class="invite-card">
+          <h3>Create an Invitation ✨</h3>
+          <p>Ask about a date, a plan, or anything important. When your partner opens the web app, it pops up on their screen until they answer.</p>
+          <div class="invite-form">
+            <input type="text" id="invite-title-input" placeholder="Title: Movie date? Dinner? Something important?"/>
+            <input type="datetime-local" id="invite-date-input"/>
+            <textarea id="invite-details-input" placeholder="What is the plan? Example: Are you free on this date? I want to invite you to... 💕"></textarea>
+            <button class="btn-rose" onclick="sendInvitation()">Send Invitation 💌</button>
+          </div>
+        </div>
+        <div class="invite-card">
+          <h3>Pending For You 🔔</h3>
+          <p>Invites from your partner that still need your answer.</p>
+          <div id="pending-invites-list" class="invite-list"></div>
+        </div>
+      </div>
+      <div class="invite-layout">
+        <div class="invite-card">
+          <h3>Sent Invitations 📤</h3>
+          <div id="sent-invites-list" class="invite-list"></div>
+        </div>
+        <div class="invite-card">
+          <h3>Answered Invitations ✅</h3>
+          <div id="answered-invites-list" class="invite-list"></div>
+        </div>
+      </div>
+    </section>
 
     <!-- GAMES -->
     <section id="games" class="section">
@@ -791,6 +891,12 @@ let currentScrambleStartedAt = null;
 let currentScrambleTimer = null;
 let lastGameActivityTs = Date.now();
 
+// ── INVITATIONS STATE ──
+let invitationsUnsubscribe = null;
+let latestInvitations = [];
+let currentInvitePopupId = null;
+let invitePopupShownIds = new Set();
+
 // ── AUTH ──
 auth.onAuthStateChanged((user) => {
   if (user) {
@@ -806,6 +912,7 @@ auth.onAuthStateChanged((user) => {
     loadMyProfile();
     watchPartnerStatus();
     watchUnreadMessages();
+    watchInvitations();
     if (heartbeatInterval) clearInterval(heartbeatInterval);
     heartbeatInterval = setInterval(() => { if (currentUser) setOnline(); }, 60000);
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -813,6 +920,7 @@ auth.onAuthStateChanged((user) => {
     currentUser = null;
     if (onlineUnsubscribe) onlineUnsubscribe();
     if (unreadUnsubscribe) unreadUnsubscribe();
+    if (invitationsUnsubscribe) invitationsUnsubscribe();
     cleanupGames();
     if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
     document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -882,7 +990,163 @@ function showSection(name) {
 }
 
 function loadAll() {
-  loadAlbums(); loadNotes(); loadTimeline(); loadMessages(); fetchAllPhotos(); loadGames();
+  loadAlbums(); loadNotes(); loadTimeline(); loadMessages(); fetchAllPhotos(); loadGames(); renderInvitations();
+}
+
+
+// ── INVITATIONS ──
+function getPartnerEmail() {
+  if (!currentUser) return '';
+  return Object.keys(ALLOWED_USERS).find(e => e !== currentUser.email.toLowerCase()) || '';
+}
+
+function formatInviteDate(value) {
+  if (!value) return 'No date selected yet';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  return d.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function sendInvitation() {
+  if (!currentUser) return;
+  const title = document.getElementById('invite-title-input').value.trim();
+  const dateValue = document.getElementById('invite-date-input').value;
+  const details = document.getElementById('invite-details-input').value.trim();
+  const partnerEmail = getPartnerEmail();
+  if (!title || !details) { alert('Add a title and plan first, boss. Empty invite is just mysterious spam 😂'); return; }
+  db.collection('invitations').add({
+    title,
+    dateValue,
+    details,
+    from: currentUser.email.toLowerCase(),
+    fromName: currentUserName,
+    to: partnerEmail,
+    toName: ALLOWED_USERS[partnerEmail] || 'Partner',
+    status: 'pending',
+    answerType: '',
+    answerText: '',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdAtMs: Date.now(),
+    answeredAt: null
+  }).then(() => {
+    document.getElementById('invite-title-input').value = '';
+    document.getElementById('invite-date-input').value = '';
+    document.getElementById('invite-details-input').value = '';
+    showGameToast('Invitation sent 💌');
+  }).catch(e => alert(e.message));
+}
+
+function watchInvitations() {
+  if (invitationsUnsubscribe) invitationsUnsubscribe();
+  invitationsUnsubscribe = db.collection('invitations').orderBy('createdAtMs','desc').limit(60).onSnapshot(snap => {
+    latestInvitations = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderInvitations();
+    const pendingForMe = latestInvitations.filter(i => currentUser && i.to === currentUser.email.toLowerCase() && i.status === 'pending');
+    updateInviteBadge(pendingForMe.length);
+    if (pendingForMe.length) {
+      const newest = pendingForMe[0];
+      if (!invitePopupShownIds.has(newest.id)) {
+        invitePopupShownIds.add(newest.id);
+        showInvitePopup(newest);
+        sendPushNotification('Invitation 💌', `${newest.fromName || 'Partner'} invited you: ${newest.title}`);
+      }
+    }
+  });
+}
+
+function updateInviteBadge(count) {
+  const badge = document.getElementById('nav-invite-badge');
+  if (!badge) return;
+  badge.className = count ? 'msg-badge' : '';
+  badge.textContent = count ? count : '';
+}
+
+function renderInvitations() {
+  const pendingBox = document.getElementById('pending-invites-list');
+  const sentBox = document.getElementById('sent-invites-list');
+  const answeredBox = document.getElementById('answered-invites-list');
+  if (!pendingBox || !sentBox || !answeredBox || !currentUser) return;
+  const me = currentUser.email.toLowerCase();
+  const pending = latestInvitations.filter(i => i.to === me && i.status === 'pending');
+  const sent = latestInvitations.filter(i => i.from === me);
+  const answered = latestInvitations.filter(i => (i.to === me || i.from === me) && i.status !== 'pending');
+  pendingBox.innerHTML = pending.length ? pending.map(inviteHtml).join('') : '<p>No pending invites. Peaceful... for now 😌</p>';
+  sentBox.innerHTML = sent.length ? sent.map(inviteHtml).join('') : '<p>No sent invites yet.</p>';
+  answeredBox.innerHTML = answered.length ? answered.map(inviteHtml).join('') : '<p>No answered invites yet.</p>';
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+}
+
+function inviteHtml(i) {
+  const pending = i.status === 'pending';
+  const statusClass = pending ? 'pending' : 'yes';
+  const answer = !pending ? `<div class="invite-answer"><strong>Answer:</strong> ${escapeHtml(i.answerType || '')}${i.answerText ? ' — ' + escapeHtml(i.answerText) : ''}</div>` : '';
+  const respondBtn = pending && currentUser && i.to === currentUser.email.toLowerCase() ? `<button class="btn-rose" onclick="showInvitePopupById('${i.id}')">Answer now 💕</button>` : '';
+  return `<div class="invite-item ${pending ? 'pending' : 'answered'}">
+    <div class="invite-item-top"><div class="invite-title">${escapeHtml(i.title)}</div><span class="invite-status ${statusClass}">${pending ? 'Pending' : 'Answered'}</span></div>
+    <div class="invite-meta">From ${escapeHtml(i.fromName)} to ${escapeHtml(i.toName)} • ${formatInviteDate(i.dateValue)}</div>
+    <p>${escapeHtml(i.details)}</p>
+    ${answer}
+    <div class="invite-actions">${respondBtn}${i.from === (currentUser && currentUser.email.toLowerCase()) ? `<button class="btn-danger" onclick="deleteInvitation('${i.id}')">Delete</button>` : ''}</div>
+  </div>`;
+}
+
+function showInvitePopupById(id) {
+  const inv = latestInvitations.find(i => i.id === id);
+  if (inv) showInvitePopup(inv);
+}
+
+function openPendingInvitePopup() {
+  if (!currentUser) return;
+  const me = currentUser.email.toLowerCase();
+  const inv = latestInvitations.find(i => i.to === me && i.status === 'pending');
+  if (inv) showInvitePopup(inv); else showGameToast('No pending invitation 💕');
+}
+
+function showInvitePopup(inv) {
+  currentInvitePopupId = inv.id;
+  document.getElementById('invite-popup-heading').textContent = `${inv.fromName || 'Partner'} is inviting you to something important`;
+  document.getElementById('invite-popup-message').textContent = 'You have been summoned. Please answer carefully. The ignore button is feeling shy today 😂';
+  document.getElementById('invite-popup-title').textContent = inv.title || 'Invitation';
+  document.getElementById('invite-popup-date').textContent = 'Plan date: ' + formatInviteDate(inv.dateValue);
+  document.getElementById('invite-popup-details').textContent = inv.details || '';
+  document.getElementById('invite-answer-text').value = '';
+  document.getElementById('invite-ignore-btn').style.transform = 'translate(0,0)';
+  document.getElementById('invite-popup-overlay').classList.add('open');
+}
+
+function runawayIgnoreButton() {
+  const btn = document.getElementById('invite-ignore-btn');
+  const card = document.getElementById('invite-popup-card');
+  if (!btn || !card) return;
+  const maxX = Math.max(80, card.clientWidth / 2 - 80);
+  const maxY = 45;
+  const x = Math.round((Math.random() * 2 - 1) * maxX);
+  const y = Math.round((Math.random() * 2 - 1) * maxY);
+  btn.style.transform = `translate(${x}px, ${y}px) rotate(${Math.round(Math.random()*18-9)}deg)`;
+}
+
+function answerCurrentInvite(type) {
+  if (!currentInvitePopupId || !currentUser) return;
+  const text = document.getElementById('invite-answer-text').value.trim();
+  db.collection('invitations').doc(currentInvitePopupId).update({
+    status: 'answered',
+    answerType: type,
+    answerText: text,
+    answeredBy: currentUser.email.toLowerCase(),
+    answeredByName: currentUserName,
+    answeredAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    document.getElementById('invite-popup-overlay').classList.remove('open');
+    showGameToast(type === 'yes' ? 'Answer sent: YES 💕' : 'Answer sent 💌');
+  }).catch(e => alert(e.message));
+}
+
+function deleteInvitation(id) {
+  if (!confirm('Delete this invitation?')) return;
+  db.collection('invitations').doc(id).delete().catch(e => alert(e.message));
 }
 
 // ── ONLINE STATUS ──
